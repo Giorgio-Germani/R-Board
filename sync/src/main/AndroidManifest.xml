@@ -19,7 +19,7 @@
             android:name=".SyncSetupActivity"
             android:exported="true"
             android:label="REVENTOR Sync"
-            android:theme="@style/Theme.AppCompat.DayNight" />
+            android:theme="@style/Theme.AppCompat.DayNight.NoActionBar" />
 
         <receiver
             android:name=".SyncBootReceiver"

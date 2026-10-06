@@ -18,6 +18,9 @@ import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.updatePadding
 
 /** Minimal setup screen: permissions, pairing hint, direction toggles, start/stop. */
 class SyncSetupActivity : AppCompatActivity() {
@@ -107,6 +110,12 @@ class SyncSetupActivity : AppCompatActivity() {
             })
         }
         setContentView(root)
+        // edge-to-edge (enforced on Android 15+): keep content below the status bar
+        ViewCompat.setOnApplyWindowInsetsListener(root) { v, insets ->
+            val bars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
+            v.updatePadding(top = bars.top, bottom = bars.bottom)
+            insets
+        }
 
         toggleButton.setOnClickListener {
             if (SyncState.serviceRunning) {
