@@ -2,6 +2,10 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
 
     <uses-permission android:name="android.permission.RECORD_AUDIO" />
+    <!-- HeliBoard deliberately ships without INTERNET; we need it solely for the
+         one-time whistle.cact model download in ModelManager. The keyboard itself
+         makes no network requests. -->
+    <uses-permission android:name="android.permission.INTERNET" />
 
     <application>
         <!-- translucent activity whose only job is to host the RECORD_AUDIO runtime prompt,

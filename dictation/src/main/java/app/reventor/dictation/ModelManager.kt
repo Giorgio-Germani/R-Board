@@ -42,6 +42,7 @@ object ModelManager {
                 try {
                     conn = URL(MODEL_URL).openConnection() as HttpURLConnection
                     conn.instanceFollowRedirects = true
+                    conn.setRequestProperty("User-Agent", "Mozilla/5.0 (Android) reventor-keyboard")
                     conn.connectTimeout = 15_000
                     conn.readTimeout = 30_000
                     conn.getInputStream().use { input ->

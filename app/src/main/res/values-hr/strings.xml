@@ -91,8 +91,8 @@
     <string name="user_dict_settings_edit_dialog_title">"Uređivanje riječi"</string>
     <string name="user_dict_settings_all_languages">"Za sve jezike"</string>
     <string name="user_dict_settings_more_languages">"Više jezika…"</string>
-    <string name="spell_checker_service_name">HeliBoard provjera pravopisa</string>
-    <string name="android_spell_checker_settings">Postavke HeliBoard provjere pravopisa</string>
+    <string name="spell_checker_service_name">REVENTOR provjera pravopisa</string>
+    <string name="android_spell_checker_settings">Postavke REVENTOR provjere pravopisa</string>
     <string name="subtype_akkhor_bn_BD">%s (Akkhor)</string>
     <string name="settings_category_suggestions">Prijedlozi</string>
     <string name="settings_category_clipboard_history">Povijest međuspremnika</string>
@@ -102,7 +102,7 @@
     <string name="show_emoji_key">Tipka za emojije</string>
     <string name="abbreviation_unit_minutes">%s min</string>
     <string name="settings_no_limit">Bez ograničenja</string>
-    <string name="ime_settings">HeliBoard postavke</string>
+    <string name="ime_settings">REVENTOR postavke</string>
     <string name="settings_category_input">Unos</string>
     <string name="settings_category_additional_keys">Dodatne tipke</string>
     <string name="enable_clipboard_history">Omogući povijest međuspremnika</string>
@@ -496,7 +496,7 @@
     <string name="ask_later">Pitaj me kasnije</string>
     <string name="spell_check_suggestions">Prikaži prijedloge provjere pravopisa</string>
     <string name="spell_check_suggestions_summary">Prikazuje prijedloge kada se odabere riječ podcrtana crvenom bojom. Zahtijeva postavljanje aplikacije kao zadanog alata za provjeru pravopisa.</string>
-    <string name="gesture_data_description_privacy">Privatnost\n\nPodaci koje šaljete sastoje se od ciljne riječi, rasporeda i dimenzija tipkovnice, geste (vremena i koordinate), prijedloga trenutne biblioteke, hasha korištenih rječnika, verzije aplikacije, načina prikupljanja podataka, informacije je li biblioteka za pisanje kretnjama „zadana” Googleova biblioteka te ID-a uz svaku gestu.\nPoslani podaci bit će preuzeti i izbrisani iz ProtonMail sandučića u kojem su pohranjeni čim to bude moguće. Nakon završetka faze prikupljanja podataka gesti, prikupljeni skup podataka svih korisnika bit će objavljen pod licencijom Creative Commons BY-SA 4.0.\n\nRadi zaštite Vaše privatnosti nećete biti izričito navedeni kao autor. Zasluge će biti navedene kao „The HeliBoard Gesture Data Project Contributors”. Podatke koje generirate na ovom zaslonu ne bi trebalo biti moguće povezati s Vašim identitetom. Međutim, moglo bi biti moguće utvrditi koje je geste napravila ista osoba. To je moguće npr. na temelju prilagođenog rasporeda tipkovnice, dimenzija tipkovnice, jezika ili individualnog stila izvođenja gesti.</string>
+    <string name="gesture_data_description_privacy">Privatnost\n\nPodaci koje šaljete sastoje se od ciljne riječi, rasporeda i dimenzija tipkovnice, geste (vremena i koordinate), prijedloga trenutne biblioteke, hasha korištenih rječnika, verzije aplikacije, načina prikupljanja podataka, informacije je li biblioteka za pisanje kretnjama „zadana” Googleova biblioteka te ID-a uz svaku gestu.\nPoslani podaci bit će preuzeti i izbrisani iz ProtonMail sandučića u kojem su pohranjeni čim to bude moguće. Nakon završetka faze prikupljanja podataka gesti, prikupljeni skup podataka svih korisnika bit će objavljen pod licencijom Creative Commons BY-SA 4.0.\n\nRadi zaštite Vaše privatnosti nećete biti izričito navedeni kao autor. Zasluge će biti navedene kao „The REVENTOR Gesture Data Project Contributors”. Podatke koje generirate na ovom zaslonu ne bi trebalo biti moguće povezati s Vašim identitetom. Međutim, moglo bi biti moguće utvrditi koje je geste napravila ista osoba. To je moguće npr. na temelju prilagođenog rasporeda tipkovnice, dimenzija tipkovnice, jezika ili individualnog stila izvođenja gesti.</string>
     <string name="gesture_data_share_duplicate">Već poslane podatke možete ponovo podijeliti ako niste sigurni jesu li ispravno primljeni. Duplikate otkrivamo i uklanjamo prilikom obrade podataka.</string>
     <string name="gesture_data_please_switch_keyboard">Prijeđite na %s</string>
     <string name="gesture_data_next_save">Zabilježeno je „%s”. Kliknite ako ste sigurni da ste gestu izveli ispravno</string>
@@ -512,7 +512,7 @@
     <string name="gesture_data_delete_dialog_submitted">Izbriši poslane riječi (%s)</string>
     <string name="gesture_data_many_not_shared_words">Imate više od %s riječi koje čekaju na slanje</string>
     <string name="gesture_data_email_body">VAŽNO:\n\nPozdrav!\nPodsjećamo da će ovi podaci biti javno objavljeni pod licencijom CC BY-SA 4.0, a Vi radi zaštite privatnosti nećete biti navedeni kao autor.\n\nHvala što s nama dijelite prava na svoje podatke. Dobro ćemo ih iskoristiti!\n\nImajte na umu da promjena teksta ove obavijesti ne mijenja ono što ćemo učiniti s Vašim podacima. Ovo nije ugovor koji se može mijenjati, već samo prijateljski podsjetnik!\nAko nam uz podatke želite poslati poruku, napišite ju ispod crte.\n---------------------------------------------</string>
-    <string name="gesture_data_promotion_message">Pozdrav!\nBudući da ste instalirali biblioteku za pisanje kretnjama, možda će Vas zanimati HeliBoardov projekt stvaranja potpuno otvorene biblioteke za pisanje kretnjama. Možete pomoći doprinošenjem podataka gesti. Za više informacija posjetite zaslon za prikupljanje podataka gesti.</string>
+    <string name="gesture_data_promotion_message">Pozdrav!\nBudući da ste instalirali biblioteku za pisanje kretnjama, možda će Vas zanimati REVENTORov projekt stvaranja potpuno otvorene biblioteke za pisanje kretnjama. Možete pomoći doprinošenjem podataka gesti. Za više informacija posjetite zaslon za prikupljanje podataka gesti.</string>
     <string name="gesture_data_reminder_message">Pozdrav!\nRanije ste koristili prikupljanje podataka gesti, ali već dulje vrijeme niste dodali podatke. Želite li ponovo doprinijeti?</string>
     <string name="gesture_data_take_me_there">Odvedi me tamo</string>
     <string name="background_gesture_data_links">Informacije o pozadinskom prikupljanju:</string>
@@ -522,7 +522,7 @@
     <string name="gesture_data_background_gathering_manual_save">Zadano odbacivanje</string>
     <string name="gesture_data_background_gathering_manual_save_summary">Podaci se spremaju ručno pomoću tipke alatne trake</string>
     <string name="gesture_data_background_gathering_info">Više informacija</string>
-    <string name="gesture_data_background_gathering_info_message">Uključivanje pozadinskog prikupljanja podataka omogućuje HeliBoardu bilježenje gesti koje unosite u drugim aplikacijama. To je vrlo korisno za projekt pisanja kretnjama jer može proizvesti znatnu količinu podataka, iako niže kvalitete od aktivnog prikupljanja. Pozadinsko prikupljanje podataka nije zamjena za aktivno prikupljene podatke, već dodatak, jer je kvaliteta podataka važnija od količine.\n\nPozadinsko prikupljanje ima velik potencijal prikupljanja podataka koje možda smatrate previše privatnima za dijeljenje, čak i kada se objavljuju anonimno. Zbog toga želimo pojasniti kada se podaci gesti prikupljaju i kako na to možete utjecati.\n\nVideozapis koji detaljnije objašnjava pozadinsko prikupljanje podataka možete pronaći u odjeljku s poveznicama u donjem desnom dijelu ovog zaslona.</string>
+    <string name="gesture_data_background_gathering_info_message">Uključivanje pozadinskog prikupljanja podataka omogućuje REVENTORu bilježenje gesti koje unosite u drugim aplikacijama. To je vrlo korisno za projekt pisanja kretnjama jer može proizvesti znatnu količinu podataka, iako niže kvalitete od aktivnog prikupljanja. Pozadinsko prikupljanje podataka nije zamjena za aktivno prikupljene podatke, već dodatak, jer je kvaliteta podataka važnija od količine.\n\nPozadinsko prikupljanje ima velik potencijal prikupljanja podataka koje možda smatrate previše privatnima za dijeljenje, čak i kada se objavljuju anonimno. Zbog toga želimo pojasniti kada se podaci gesti prikupljaju i kako na to možete utjecati.\n\nVideozapis koji detaljnije objašnjava pozadinsko prikupljanje podataka možete pronaći u odjeljku s poveznicama u donjem desnom dijelu ovog zaslona.</string>
     <string name="gesture_data_background_gathering_indicator">Indikator prikupljanja podataka</string>
     <string name="gesture_data_background_gathering_indicator_message">Kad god se podaci gesti mogu bilježiti, u donjem lijevom dijelu tipkovnice vidjet ćete ikonu indikatora. Kada je krug ispunjen, prikupljena je barem jedna gesta koja čeka na spremanje. Podaci se spremaju pomoću tipke alatne trake (pogledajte &lt;i&gt;%1$s&lt;/i&gt;) ili automatski (kada je &lt;i&gt;%2$s&lt;/i&gt; onemogućeno). Automatsko spremanje obično se događa pri promjeni polja za unos teksta ili zatvaranju tipkovnice, ali i ako se polje za unos promijeni iz nekog drugog razloga. Dok se podaci spremaju, indikator će nakratko postati zelen.</string>
     <string name="gesture_data_background_gathering_control">Kako upravljati onim što se sprema</string>

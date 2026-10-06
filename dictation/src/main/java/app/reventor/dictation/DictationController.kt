@@ -14,12 +14,16 @@ import android.os.Handler
 import android.os.Looper
 
 /**
- * Push-to-talk dictation for the keyboard's voice key:
- * press-and-hold starts 16 kHz mono capture, release transcribes via
- * Needle/Whistle fully offline and commits the text at the cursor.
+ * Offline dictation for the keyboard's voice key, two interaction styles:
  *
- * Called from the IME's key-press/release plumbing; all slow work runs on a
- * single executor (which also serializes engine access).
+ *  - Layout shortcut key (sends press/release): push-to-talk — press-and-hold
+ *    records, release transcribes and commits.
+ *  - Toolbar mic (fires only a tap code event): tap-to-toggle — first tap starts
+ *    recording, second tap stops and commits.
+ *
+ * The tap event arrives for both styles, so [onVoiceKeyTap] must consume the
+ * gesture a press/release already handled instead of starting a second recording.
+ * All slow work runs on a single executor (which also serializes engine access).
  */
 class DictationController(private val ime: InputMethodService) {
 
@@ -42,7 +46,12 @@ class DictationController(private val ime: InputMethodService) {
 
     // gesture bookkeeping between press / release / tap events
     @Volatile
-    private var pressHandled = false
+    private var gestureHandled = false // press started a dictation gesture (PTT)
+
+    // timestamp of the last press/release belonging to a PTT gesture — the tap
+    // event for that gesture may arrive BEFORE or AFTER the release (device-dependent)
+    @Volatile
+    private var lastGestureAt = 0L
 
     @Volatile
     private var pendingRelease = false
@@ -50,46 +59,75 @@ class DictationController(private val ime: InputMethodService) {
     @Volatile
     private var sessionActive = false
 
-    /** Key-down on the voice key. */
+    /** Key-down on the layout voice key: start push-to-talk. */
     fun onPressStart() {
-        pressHandled = false
+        Log.d(TAG, "onPressStart: engine available=${NeedleEngine.available()}")
+        gestureHandled = false
         pendingRelease = false
         if (!NeedleEngine.available()) return // no native lib (wrong ABI) → legacy voice IME
-        pressHandled = true
+        gestureHandled = true
+        lastGestureAt = android.os.SystemClock.uptimeMillis()
         if (!hasMicPermission()) {
             launchPermissionActivity()
             return
         }
-        executor.execute {
-            val model = ModelManager.modelFile(ime)
-            if (!model.exists()) {
-                if (ModelManager.startDownload(ime)) {
-                    toast("Downloading dictation model (17 MB)…")
-                } else {
-                    toast("Dictation model is downloading…")
-                }
-                return@execute
-            }
-            if (!NeedleEngine.ensureLoaded(model)) {
-                toast("Dictation failed to load")
-                return@execute
-            }
-            startRecorder()
-        }
+        executor.execute { prepareAndStartRecording() }
     }
 
-    /** Key-up on the voice key. */
+    /** Key-up on the layout voice key: stop and transcribe. */
     fun onPressEnd() {
-        if (!pressHandled) return
+        Log.d(TAG, "onPressEnd: gestureHandled=$gestureHandled sessionActive=$sessionActive")
+        if (!gestureHandled) return
+        gestureHandled = false
+        lastGestureAt = android.os.SystemClock.uptimeMillis()
         pendingRelease = true
         if (sessionActive) finalizeOnExecutor()
     }
 
     /**
-     * Tap-complete event for KeyCode.VOICE_INPUT. Returns true when dictation handled
-     * this gesture (so the legacy switch-to-external-voice-IME path must be skipped).
+     * Tap-complete event for KeyCode.VOICE_INPUT (fires for toolbar mic AND layout key).
+     * Returns true when dictation handled this gesture, so the legacy
+     * switch-to-external-voice-IME path must be skipped.
      */
-    fun onVoiceKeyTap(): Boolean = pressHandled
+    fun onVoiceKeyTap(): Boolean {
+        Log.d(TAG, "onVoiceKeyTap: gestureHandled=$gestureHandled sessionActive=$sessionActive recording=$recording")
+        // this tap belongs to a press/release gesture (it can arrive before OR after
+        // the release) — consume it so the legacy path stays out, and leave the
+        // release event something to finalize
+        if (gestureHandled || android.os.SystemClock.uptimeMillis() - lastGestureAt < 1500) {
+            return true
+        }
+        if (!NeedleEngine.available()) return false
+        if (!hasMicPermission()) {
+            launchPermissionActivity()
+            return true
+        }
+        if (sessionActive || recording) {
+            // second tap of toggle mode: stop and commit
+            finalizeOnExecutor()
+            return true
+        }
+        // first tap of toggle mode: start; keeps recording until the next tap
+        executor.execute { prepareAndStartRecording() }
+        return true
+    }
+
+    private fun prepareAndStartRecording() {
+        val model = ModelManager.modelFile(ime)
+        if (!model.exists()) {
+            if (ModelManager.startDownload(ime)) {
+                toast("Downloading dictation model (17 MB)…")
+            } else {
+                toast("Dictation model is downloading…")
+            }
+            return
+        }
+        if (!NeedleEngine.ensureLoaded(model)) {
+            toast("Dictation failed to load")
+            return
+        }
+        startRecorder()
+    }
 
     private fun hasMicPermission(): Boolean =
         ContextCompat.checkSelfPermission(ime, android.Manifest.permission.RECORD_AUDIO) ==
@@ -137,8 +175,12 @@ class DictationController(private val ime: InputMethodService) {
                     }
                 }
             }
+            // hit the 30 s cap with nobody pressing stop (user walked away) — auto-finalize
+            if (totalSamples >= MAX_SAMPLES && sessionActive) {
+                finalizeOnExecutor()
+            }
         }.also { it.start() }
-        toast("● recording")
+        toast("● recording — mic key again to finish")
         if (pendingRelease) finalizeOnExecutor()
     }
 
@@ -191,9 +233,11 @@ class DictationController(private val ime: InputMethodService) {
     /** Keyboard language, or null to let Whistle auto-detect. */
     private fun currentLanguage(): String? {
         return try {
+            @Suppress("DEPRECATION")
             val imm = ime.getSystemService(android.content.Context.INPUT_METHOD_SERVICE) as android.view.inputmethod.InputMethodManager
-            val locale = imm.currentInputMethodSubtype?.locale
-            when (locale?.lowercase()?.substringBefore('_')) {
+            val code = imm.currentInputMethodSubtype?.locale
+                ?: ime.resources.configuration.locales[0].language
+            when (code.lowercase().substringBefore('_')) {
                 "de" -> "de"
                 "en" -> "en"
                 else -> null
