@@ -1,2 +1,3 @@
 include ':app'
+include ':sync'
 include ':tools:make-emoji-keys'
