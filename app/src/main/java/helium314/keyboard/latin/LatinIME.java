@@ -39,6 +39,8 @@ import helium314.keyboard.compat.ConfigurationCompatKt;
 import helium314.keyboard.compat.EditorInfoCompatUtils;
 import helium314.keyboard.compat.ImeCompat;
 import helium314.keyboard.event.HapticEvent;
+import android.inputmethodservice.InputMethodService;
+import app.reventor.dictation.DictationController;
 import helium314.keyboard.keyboard.KeyboardActionListener;
 import helium314.keyboard.keyboard.KeyboardActionListenerImpl;
 import helium314.keyboard.keyboard.KeyboardMode;
@@ -1427,8 +1429,18 @@ public class LatinIME extends InputMethodService implements
 
     // This method is public for testability of LatinIME, but also in the future it should
     // completely replace #onCodeInput.
+    private DictationController mDictationController;
+
+    public DictationController getDictation() {
+        if (mDictationController == null) mDictationController = new DictationController(this);
+        return mDictationController;
+    }
+
     public void onEvent(@NonNull final Event event) {
         if (KeyCode.VOICE_INPUT == event.getKeyCode()) {
+            // offline push-to-talk dictation (Needle/Whistle); fall back to the
+            // external voice-IME shortcut when dictation is unavailable on this device
+            if (getDictation().onVoiceKeyTap()) return;
             mRichImm.switchToShortcutIme(this);
         }
         final InputTransaction completeInputTransaction =

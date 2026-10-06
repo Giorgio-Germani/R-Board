@@ -1,3 +1,4 @@
 include ':app'
 include ':sync'
+include ':dictation'
 include ':tools:make-emoji-keys'

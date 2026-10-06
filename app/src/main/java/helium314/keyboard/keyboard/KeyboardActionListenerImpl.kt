@@ -50,6 +50,7 @@ class KeyboardActionListenerImpl(private val latinIME: LatinIME, private val inp
     private var subtypeSwitchCount = 0
 
     override fun onPressKey(primaryCode: Int, repeatCount: Int, pointerCount: Int, hapticEvent: HapticEvent) {
+        if (primaryCode == KeyCode.VOICE_INPUT) latinIME.dictation.onPressStart()
         metaOnPressKey(primaryCode)
         keyboardSwitcher.onPressKey(primaryCode, pointerCount, latinIME.currentAutoCapsState, latinIME.currentRecapitalizeState)
         // we need to use LatinIME for handling of key-down audio and haptics
@@ -62,6 +63,7 @@ class KeyboardActionListenerImpl(private val latinIME: LatinIME, private val inp
     }
 
     override fun onReleaseKey(primaryCode: Int, withSliding: Boolean) {
+        if (primaryCode == KeyCode.VOICE_INPUT) latinIME.dictation.onPressEnd()
         metaOnReleaseKey(primaryCode)
         keyboardSwitcher.onReleaseKey(primaryCode, withSliding, latinIME.currentAutoCapsState, latinIME.currentRecapitalizeState)
     }
