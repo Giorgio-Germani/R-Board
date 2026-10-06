@@ -292,7 +292,7 @@ class DynamicColors(context: Context, override val themeStyle: String, override 
         ACTION_KEY_POPUP_KEYS_BACKGROUND -> if (themeStyle == STYLE_HOLO) adjustedBackground else accent
         STRIP_BACKGROUND -> if (!hasKeyBorders && themeStyle == STYLE_MATERIAL) adjustedBackground else background
         CLIPBOARD_SUGGESTION_BACKGROUND -> keyBackground
-        NAVIGATION_BAR -> navBar
+        NAVIGATION_BAR -> background
         MORE_SUGGESTIONS_HINT, SUGGESTED_WORD, SUGGESTION_TYPED_WORD, SUGGESTION_VALID_WORD -> adjustedKeyText
         ACTION_KEY_ICON, TOOL_BAR_EXPAND_KEY -> Color.WHITE
     }
@@ -490,7 +490,7 @@ class DefaultColors (
         KEY_BACKGROUND -> keyBackground
         ACTION_KEY_POPUP_KEYS_BACKGROUND -> if (themeStyle == STYLE_HOLO) adjustedBackground else accent
         STRIP_BACKGROUND -> if (!hasKeyBorders && themeStyle == STYLE_MATERIAL) adjustedBackground else background
-        NAVIGATION_BAR -> navBar
+        NAVIGATION_BAR -> background
         SUGGESTION_AUTO_CORRECT, EMOJI_CATEGORY, TOOL_BAR_KEY, TOOL_BAR_EXPAND_KEY, ONE_HANDED_MODE_BUTTON -> suggestionText
         MORE_SUGGESTIONS_HINT, SUGGESTED_WORD, SUGGESTION_TYPED_WORD, SUGGESTION_VALID_WORD -> adjustedSuggestionText
         ACTION_KEY_ICON -> Color.WHITE

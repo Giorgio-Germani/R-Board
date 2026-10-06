@@ -167,7 +167,7 @@ object Defaults {
     const val PREF_CLIPBOARD_FILES_SIZE_LIMIT = 20 // megabytes
     const val PREF_ADD_TO_PERSONAL_DICTIONARY = false
     @JvmField
-    val PREF_NAVBAR_COLOR = Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q
+    val PREF_NAVBAR_COLOR = true // nav bar follows the keyboard background by default
     const val PREF_ENABLED_SUBTYPES = ""
     const val PREF_SELECTED_SUBTYPE = ""
     const val PREF_URL_DETECTION = false
