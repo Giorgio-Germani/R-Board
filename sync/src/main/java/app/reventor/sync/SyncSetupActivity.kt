@@ -7,6 +7,8 @@ import android.os.Build
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
+import android.net.Uri
+import android.os.PowerManager
 import android.provider.Settings
 import android.view.Gravity
 import android.widget.Button
@@ -27,6 +29,9 @@ class SyncSetupActivity : AppCompatActivity() {
 
     private lateinit var statusView: TextView
     private lateinit var toggleButton: Button
+    private lateinit var batteryButton: Button
+    private lateinit var batteryText: TextView
+    private var guidanceText: TextView? = null
 
     private val refreshHandler = Handler(Looper.getMainLooper())
     private val refreshRunnable: Runnable = object : Runnable {
@@ -79,6 +84,27 @@ class SyncSetupActivity : AppCompatActivity() {
             text = "Pair desktop (open Bluetooth settings)"
             setOnClickListener { startActivity(Intent(Settings.ACTION_BLUETOOTH_SETTINGS)) }
         }
+        batteryButton = Button(this).apply {
+            setOnClickListener {
+                val intent = Intent(
+                    Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS,
+                    Uri.parse("package:$packageName")
+                )
+                startActivity(intent)
+            }
+        }
+        batteryText = TextView(this).apply {
+            textSize = 12f
+            setPadding(0, 4, 0, 4)
+        }
+        val guidance = manufacturerGuidance()
+        if (guidance != null) {
+            guidanceText = TextView(this).apply {
+                textSize = 12f
+                text = guidance
+                setPadding(0, 6, 0, 6)
+            }
+        } else guidanceText = null
         val toDesktop = CheckBox(this).apply {
             text = "Push phone clipboard → desktop"
             isChecked = SyncPrefs.pushToDesktop(this@SyncSetupActivity)
@@ -104,6 +130,9 @@ class SyncSetupActivity : AppCompatActivity() {
                 addView(notifButton)
                 addView(btButton)
                 addView(pairButton)
+                addView(batteryButton)
+                addView(batteryText)
+                guidanceText?.let { addView(it) }
                 addView(toDesktop)
                 addView(toPhone)
                 addView(toggleButton)
@@ -160,5 +189,30 @@ class SyncSetupActivity : AppCompatActivity() {
         toggleButton.text = if (SyncState.serviceRunning) "Stop sync" else "Start sync"
         // connectedDevice FGS cannot start without BLUETOOTH_CONNECT on API 34+
         toggleButton.isEnabled = btGranted
+        val pm = getSystemService(PowerManager::class.java)
+        val ignoring = pm.isIgnoringBatteryOptimizations(packageName)
+        batteryText.text = if (ignoring) {
+            "Batterieoptimierung: ignoriert (gut)"
+        } else {
+            "Batterieoptimierung: AKTIV — antippen, damit der Sync dauerhaft läuft"
+        }
+        batteryButton.text = if (ignoring) "Batterieoptimierung OK ✓" else "Batterieoptimierung deaktivieren"
+    }
+
+    /** Per-OEM battery management hints (the sync service runs 24/7 and is a prime target). */
+    private fun manufacturerGuidance(): String? {
+        val m = android.os.Build.MANUFACTURER.lowercase()
+        return when {
+            m == "xiaomi" || m == "poco" || m == "redmi" -> (
+                "Xiaomi/HyperOS zusätzlich: Einstellungen → Apps → R-Board → " +
+                "Autostart erlauben, Akku → Keine Einschränkungen, und in den " +
+                "recent Apps R-Board festpinen."
+                )
+            m == "samsung" -> (
+                "Samsung zusätzlich: Einstellungen → Akku → Hintergrundnutzungslimits → " +
+                "R-Board aus 'Ruhende Apps' entfernen."
+                )
+            else -> null
+        }
     }
 }

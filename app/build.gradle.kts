@@ -22,8 +22,18 @@ android {
         proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
     }
 
+    signingConfigs {
+        create("release") {
+            storeFile = file("D:/Dev/keys/keystore.jks")
+            storePassword = "reventor"
+            keyAlias = "reventor"
+            keyPassword = "reventor"
+        }
+    }
+
     buildTypes {
         release {
+            signingConfig = signingConfigs.getByName("release")
             isMinifyEnabled = true
             isShrinkResources = false
             isDebuggable = false
@@ -43,6 +53,7 @@ android {
             applicationIdSuffix = ".debug"
         }
         create("runTests") { // build variant for running tests on CI that skips tests known to fail
+            matchingFallbacks += listOf("release")
             isMinifyEnabled = false
             isJniDebuggable = false
         }
