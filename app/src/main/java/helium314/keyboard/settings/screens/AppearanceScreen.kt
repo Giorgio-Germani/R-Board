@@ -1,5 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0-only
 package helium314.keyboard.settings.screens
+import android.content.SharedPreferences
+import android.widget.EditText
 
 import android.content.Context
 import android.os.Build
@@ -67,6 +69,8 @@ fun AppearanceScreen(
             Settings.PREF_THEME_DAY_NIGHT else null,
         Settings.PREF_THEME_COLORS,
         if (dayNightMode) Settings.PREF_THEME_COLORS_NIGHT else null,
+        KeyboardTheme.PREF_TWO_COLOR_BACKGROUND,
+        KeyboardTheme.PREF_TWO_COLOR_TEXT,
         Settings.PREF_NAVBAR_COLOR,
         SettingsWithoutKey.BACKGROUND_IMAGE,
         SettingsWithoutKey.BACKGROUND_IMAGE_LANDSCAPE,
@@ -193,6 +197,37 @@ fun createAppearanceSettings(context: Context) = listOf(
                 isNight = true,
                 default = Defaults.PREF_THEME_COLORS_NIGHT
             )
+    },
+    Setting(context, KeyboardTheme.PREF_TWO_COLOR_BACKGROUND, R.string.two_color_background) { setting ->
+        val ctx = LocalContext.current
+        val prefs = ctx.prefs()
+        val reload = (ctx.getActivity() as? SettingsActivity)?.prefChanged?.collectAsState()
+        Preference(
+            name = setting.title,
+            description = prefs.getString(setting.key, null)?.let { c ->
+                String.format("#%06X", (c.toIntOrNull() ?: 0) and 0xFFFFFF)
+            } ?: ctx.getString(R.string.two_color_off),
+            onClick = {
+                showTwoColorDialog(ctx, prefs, setting.key, setting.title) {
+                    KeyboardSwitcher.getInstance().setThemeNeedsReload()
+                }
+            }
+        )
+    },
+    Setting(context, KeyboardTheme.PREF_TWO_COLOR_TEXT, R.string.two_color_text) { setting ->
+        val ctx = LocalContext.current
+        val prefs = ctx.prefs()
+        Preference(
+            name = setting.title,
+            description = prefs.getString(setting.key, null)?.let { c ->
+                String.format("#%06X", (c.toIntOrNull() ?: 0) and 0xFFFFFF)
+            } ?: ctx.getString(R.string.two_color_off),
+            onClick = {
+                showTwoColorDialog(ctx, prefs, setting.key, setting.title) {
+                    KeyboardSwitcher.getInstance().setThemeNeedsReload()
+                }
+            }
+        )
     },
     Setting(context, Settings.PREF_THEME_KEY_BORDERS, R.string.key_borders) {
         SwitchPreference(it, Defaults.PREF_THEME_KEY_BORDERS) { KeyboardSwitcher.getInstance().setThemeNeedsReload() }
@@ -364,4 +399,27 @@ private fun Preview() {
             AppearanceScreen { }
         }
     }
+}
+
+/** Hex color input dialog ("#RRGGBB"); empty input or "Aus" clears the setting. */
+private fun showTwoColorDialog(context: Context, prefs: SharedPreferences, key: String, title: String, onChange: () -> Unit) {
+    val input = EditText(context)
+    input.hint = "#RRGGBB"
+    input.inputType = android.text.InputType.TYPE_CLASS_TEXT
+    input.setText(prefs.getString(key, null)?.let { c -> String.format("#%06X", (c.toIntOrNull() ?: 0) and 0xFFFFFF) } ?: "")
+    android.app.AlertDialog.Builder(context)
+        .setTitle(title)
+        .setView(input)
+        .setPositiveButton(android.R.string.ok) { _, _ ->
+            val hex = input.text.toString().trim().removePrefix("#").removePrefix("0x").take(6)
+            val value = hex.toLongOrNull(16)?.let { (0xFF000000L or it).toInt() }
+            if (value == null) prefs.edit().remove(key).apply()
+            else prefs.edit().putString(key, value.toString()).apply()
+            onChange()
+        }
+        .setNeutralButton(R.string.two_color_off) { _, _ ->
+            prefs.edit().remove(key).apply()
+            onChange()
+        }
+        .show()
 }

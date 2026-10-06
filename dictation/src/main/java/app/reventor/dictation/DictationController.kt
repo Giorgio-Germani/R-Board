@@ -166,12 +166,35 @@ class DictationController(private val ime: InputMethodService) {
         rec.startRecording()
         readerThread = Thread {
             val tmp = FloatArray(SAMPLE_RATE / 5) // 200 ms
+            var unstreamed = ArrayList<FloatArray>()
+            var unstreamedSamples = 0
+            val language = currentLanguage()
             while (recording && totalSamples < MAX_SAMPLES) {
                 val n = rec.read(tmp, 0, tmp.size, AudioRecord.READ_BLOCKING)
                 if (n > 0) {
                     synchronized(chunks) {
                         chunks.add(tmp.copyOf(n))
                         totalSamples += n
+                    }
+                    unstreamed.add(tmp.copyOf(n))
+                    unstreamedSamples += n
+                    if (unstreamedSamples >= SAMPLE_RATE) {
+                        // ~1 s of new audio: stream it; the engine commits the words
+                        // that two consecutive passes agree on
+                        val seg = FloatArray(unstreamedSamples)
+                        var off = 0
+                        for (c in unstreamed) {
+                            System.arraycopy(c, 0, seg, off, c.size)
+                            off += c.size
+                        }
+                        unstreamed.clear()
+                        unstreamedSamples = 0
+                        val committed = NeedleEngine.streamProcess(seg, language, null)
+                        if (committed.isNotEmpty()) {
+                            main.post {
+                                ime.currentInputConnection?.commitText(committed.trim() + " ", 1)
+                            }
+                        }
                     }
                 }
             }
@@ -189,13 +212,24 @@ class DictationController(private val ime: InputMethodService) {
         executor.execute {
             val pcm = stopRecorder() ?: return@execute
             val language = currentLanguage()
-            val text = NeedleEngine.transcribe(pcm, language, null)
+            // flush the sub-second remainder into the stream, then take the
+            // uncommitted tail the engine held back
+            var text = ""
+            if (pcm.isNotEmpty()) {
+                text += NeedleEngine.streamProcess(pcm, language, null)
+            }
+            text += NeedleEngine.streamStop()
+            text = text.trim()
+            if (text.isEmpty()) {
+                main.post { toast("Nothing heard") }
+                return@execute
+            }
+            // every dictation becomes a clean sentence: end punctuation + space,
+            // so consecutive recordings read as separate sentences
+            if (text.last() !in ".!?…") text += "."
+            text += " "
             main.post {
-                if (text.isNotEmpty()) {
-                    ime.currentInputConnection?.commitText(text, 1)
-                } else {
-                    toast("Nothing heard")
-                }
+                ime.currentInputConnection?.commitText(text, 1)
             }
         }
     }

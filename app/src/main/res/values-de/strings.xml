@@ -548,4 +548,7 @@
     <string name="gesture_data_swipe_o_scope">Werkzeug zur Visualisierung von Gestendaten: &lt;a href=%s&gt;Swipe-O-Scope&lt;/a&gt;</string>
     <string name="show_dpad_key">Steuerkreuztaste</string>
     <string name="recent_emojis_cleared">Zuletzt verwendete Emojis gelöscht</string>
+    <string name="two_color_background">Hintergrundfarbe der Tastatur (Zwei-Farben-Modus)</string>
+    <string name="two_color_text">Textfarbe der Tasten (Zwei-Farben-Modus)</string>
+    <string name="two_color_off">Aus</string>
 </resources>

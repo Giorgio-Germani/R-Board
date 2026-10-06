@@ -1390,35 +1390,16 @@ public class LatinIME extends InputMethodService implements
 
     // called when language switch key is pressed (either the keyboard key, or long-press comma)
     public void switchToNextSubtype() {
-        final boolean switchSubtype = mSettings.getCurrent().mLanguageSwitchKeyToOtherSubtypes;
-        final boolean switchIme = mSettings.getCurrent().mLanguageSwitchKeyToOtherImes;
-
-        // switch IME if wanted and possible
-        if (switchIme && !switchSubtype && ImeCompat.INSTANCE.switchInputMethod(this))
-            return;
+        // product decision: the language key only ever cycles REVENTOR's own languages
+        // and must never offer or switch to another keyboard
         final boolean hasMoreThanOneSubtype = mRichImm.hasMultipleEnabledSubtypesInThisIme(true);
-        // switch subtype if wanted, do nothing if no other subtype is available
-        if (switchSubtype && !switchIme) {
-            if (hasMoreThanOneSubtype)
-                // switch to previous subtype if current one was used, otherwise cycle through list
-                mSubtypeState.switchSubtype(mRichImm);
-            return;
-        }
-        // language key set to switch both, or language key is not shown on keyboard -> switch both
         if (hasMoreThanOneSubtype && mSubtypeState.getCurrentSubtypeHasBeenUsed()) {
             mSubtypeState.switchSubtype(mRichImm);
             return;
         }
-        if (ImeCompat.INSTANCE.shouldSwitchToOtherInputMethods(this)) {
-            final InputMethodSubtype nextSubtype = mRichImm.getNextSubtypeInThisIme(false);
-            if (nextSubtype != null) {
-                switchToSubtype(nextSubtype);
-                return;
-            } else if (ImeCompat.INSTANCE.switchInputMethod(this)) {
-                return;
-            }
-        }
-        mSubtypeState.switchSubtype(mRichImm);
+        final InputMethodSubtype nextSubtype = mRichImm.getNextSubtypeInThisIme(true);
+        if (nextSubtype != null)
+            switchToSubtype(nextSubtype);
     }
 
     // Implementation of {@link SuggestionStripView.Listener}.

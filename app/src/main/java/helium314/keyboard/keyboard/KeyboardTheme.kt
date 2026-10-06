@@ -141,7 +141,37 @@ private constructor(val themeId: Int, @JvmField val mStyleId: Int) {
                 prefs.getString(Settings.PREF_THEME_COLORS, Defaults.PREF_THEME_COLORS)
             val themeStyle = prefs.getString(Settings.PREF_THEME_STYLE, Defaults.PREF_THEME_STYLE)
 
-            return getThemeColors(themeName!!, themeStyle!!, context, prefs, isNight)
+            return applyTwoColorMode(getThemeColors(themeName!!, themeStyle!!, context, prefs, isNight), prefs)
+        }
+
+        const val PREF_TWO_COLOR_BACKGROUND = "two_color_background"
+        const val PREF_TWO_COLOR_TEXT = "two_color_text"
+
+        /* product decision: the user picks exactly two colors — keyboard background and
+         * key text. Key surfaces derive as progressively lighter blends of the
+         * background so the keyboard stays readable with any color pair. */
+        private fun applyTwoColorMode(colors: Colors, prefs: SharedPreferences): Colors {
+            val bg = prefs.getString(PREF_TWO_COLOR_BACKGROUND, null)?.toIntOrNull() ?: return colors
+            val text = prefs.getString(PREF_TWO_COLOR_TEXT, null)?.toIntOrNull() ?: return colors
+            fun blend(c: Int, other: Int, f: Float) = androidx.core.graphics.ColorUtils.blendARGB(c, other, f)
+            val white = 0xFFFFFFFF.toInt()
+            val map = EnumMap<ColorType, Int>(ColorType::class.java)
+            map[ColorType.MAIN_BACKGROUND] = bg
+            map[ColorType.STRIP_BACKGROUND] = bg
+            map[ColorType.KEY_BACKGROUND] = blend(bg, white, 0.16f)
+            map[ColorType.FUNCTIONAL_KEY_BACKGROUND] = blend(bg, white, 0.08f)
+            map[ColorType.SPACE_BAR_BACKGROUND] = blend(bg, white, 0.05f)
+            map[ColorType.KEY_PREVIEW_BACKGROUND] = blend(bg, white, 0.3f)
+            map[ColorType.POPUP_KEYS_BACKGROUND] = blend(bg, white, 0.22f)
+            map[ColorType.KEY_TEXT] = text
+            map[ColorType.KEY_HINT_TEXT] = blend(text, bg, 0.35f)
+            map[ColorType.FUNCTIONAL_KEY_TEXT] = blend(text, bg, 0.15f)
+            map[ColorType.SPACE_BAR_TEXT] = text
+            map[ColorType.SUGGESTED_WORD] = text
+            map[ColorType.SUGGESTION_TYPED_WORD] = text
+            map[ColorType.SUGGESTION_AUTO_CORRECT] = text
+            map[ColorType.GESTURE_TRAIL] = blend(text, bg, 0.45f)
+            return AllColors(map, colors.themeStyle, colors.hasKeyBorders, null)
         }
 
         private fun getThemeColors(themeName: String, themeStyle: String, context: Context, prefs: SharedPreferences, isNight: Boolean): Colors {
