@@ -70,13 +70,12 @@ fun TwoColorPickerDialog(
     var textColor by remember { mutableStateOf(initialText ?: PRESET_PAIRS.first().second) }
     var editingBackground by remember { mutableStateOf(true) }
     var hue by remember { mutableStateOf(220f) }
-    var sat by remember { mutableStateOf(0.6f) }
-    var value by remember { mutableStateOf(0.3f) }
+    var value by remember { mutableStateOf(0.4f) }
 
     fun syncHsvFrom(color: Int) {
         val hsv = FloatArray(3)
         android.graphics.Color.colorToHSV(color, hsv)
-        hue = hsv[0]; sat = hsv[1]; value = hsv[2]
+        hue = hsv[0]; value = hsv[2]
     }
     fun setTarget(color: Int) {
         val argb = 0xFF000000L or (color.toLong() and 0xFFFFFF)
@@ -143,46 +142,36 @@ fun TwoColorPickerDialog(
                 }
                 Spacer(Modifier.height(12.dp))
 
-                // saturation/value square
-                val hueColor = Color.hsv(hue, 1f, 1f)
-                androidx.compose.foundation.layout.BoxWithConstraints(
-                    Modifier
-                        .fillMaxWidth()
-                        .height(130.dp)
-                        .clip(RoundedCornerShape(10.dp))
-                        .background(Brush.verticalGradient(0f to Color.White, 1f to Color.Black))
-                        .background(Brush.horizontalGradient(0f to Color.White, 1f to hueColor))
-                        .border(1.dp, Color.Gray, RoundedCornerShape(10.dp))
-                        .pointerInput(editingBackground) {
-                            fun apply(x: Float, y: Float, w: Float, h: Float) {
-                                sat = (x / w).coerceIn(0f, 1f)
-                                value = 1f - (y / h).coerceIn(0f, 1f)
-                                setTarget(Color.hsv(hue, sat, value).toArgb())
-                            }
-                            detectTapGestures { apply(it.x, it.y, size.width.toFloat(), size.height.toFloat()) }
-                            detectDragGestures { change, _ -> apply(change.position.x, change.position.y, size.width.toFloat(), size.height.toFloat()) }
-                        }
-                ) {
-                    Box(
-                        Modifier
-                            .offset(x = (maxWidth - 14.dp) * sat, y = (maxHeight - 14.dp) * (1f - value))
-                            .size(14.dp)
-                            .border(2.dp, Color.White, CircleShape)
-                    )
-                }
-                Spacer(Modifier.height(10.dp))
-
-                // hue bar
+                // bar 1: hue
                 Box(
                     Modifier
                         .fillMaxWidth()
-                        .height(28.dp)
+                        .height(32.dp)
                         .clip(RoundedCornerShape(8.dp))
                         .background(Brush.horizontalGradient(List(7) { i -> Color.hsv(i * 60f, 1f, 1f) }))
                         .pointerInput(editingBackground) {
                             fun apply(x: Float, w: Float) {
                                 hue = (x / w).coerceIn(0f, 1f) * 360f
-                                setTarget(Color.hsv(hue, sat, value).toArgb())
+                                setTarget(Color.hsv(hue, 1f, value).toArgb())
+                            }
+                            detectTapGestures { apply(it.x, size.width.toFloat()) }
+                            detectDragGestures { change, _ -> apply(change.position.x, size.width.toFloat()) }
+                        }
+                )
+                Spacer(Modifier.height(10.dp))
+
+                // bar 2: brightness (black -> full hue color)
+                val hueColor = Color.hsv(hue, 1f, 1f)
+                Box(
+                    Modifier
+                        .fillMaxWidth()
+                        .height(32.dp)
+                        .clip(RoundedCornerShape(8.dp))
+                        .background(Brush.horizontalGradient(0f to Color.Black, 1f to hueColor))
+                        .pointerInput(editingBackground) {
+                            fun apply(x: Float, w: Float) {
+                                value = (x / w).coerceIn(0f, 1f)
+                                setTarget(Color.hsv(hue, 1f, value).toArgb())
                             }
                             detectTapGestures { apply(it.x, size.width.toFloat()) }
                             detectDragGestures { change, _ -> apply(change.position.x, size.width.toFloat()) }
