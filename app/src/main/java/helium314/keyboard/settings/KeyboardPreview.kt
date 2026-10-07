@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -99,6 +100,7 @@ private fun PreviewKeyRow(
             Box(
                 Modifier
                     .weight(1f)
+                    .height(24.dp)
                     .clip(keyShape)
                     .background(Color(colors.get(ColorType.KEY_BACKGROUND))),
                 contentAlignment = Alignment.Center
@@ -106,8 +108,7 @@ private fun PreviewKeyRow(
                 Text(
                     ch.toString(),
                     color = Color(colors.get(ColorType.KEY_TEXT)),
-                    fontSize = 11.sp,
-                    modifier = Modifier.padding(vertical = 6.dp)
+                    fontSize = 11.sp
                 )
                 hints?.getOrNull(index)?.let { hint ->
                     Text(
@@ -135,6 +136,7 @@ private fun PreviewKey(
 ) {
     Box(
         modifier
+            .height(24.dp)
             .clip(keyShape)
             .background(Color(colors.get(backgroundType))),
         contentAlignment = Alignment.Center
@@ -142,8 +144,7 @@ private fun PreviewKey(
         Text(
             label,
             color = Color(colors.get(textType)),
-            fontSize = fontSize,
-            modifier = Modifier.padding(vertical = 6.dp)
+            fontSize = fontSize
         )
     }
 }
@@ -158,6 +159,7 @@ private fun MicKey(colors: Colors, keyShape: RoundedCornerShape, modifier: Modif
     }
     Box(
         modifier
+            .height(24.dp) // same height as all other preview keys
             .clip(keyShape)
             .background(Color(colors.get(ColorType.FUNCTIONAL_KEY_BACKGROUND))),
         contentAlignment = Alignment.Center
@@ -166,7 +168,7 @@ private fun MicKey(colors: Colors, keyShape: RoundedCornerShape, modifier: Modif
             painterResource(iconRes),
             contentDescription = null,
             tint = Color(colors.get(ColorType.FUNCTIONAL_KEY_TEXT)),
-            modifier = Modifier.size(13.dp)
+            modifier = Modifier.size(15.dp)
         )
     }
 }
