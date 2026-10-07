@@ -278,7 +278,17 @@ class SyncSetupActivity : AppCompatActivity() {
         set(btCheck, btButton, btGranted)
         set(notifCheck, notifButton, notifGranted)
         set(micCheck, micButton, micGranted)
-        set(batteryCheck, batteryButton, batteryOk)
+        // battery: MIUI's "Keine Beschränkungen" selection is sufficient and not
+        // visible to the standard API — show it as a neutral recommendation, not an error
+        if (batteryOk) {
+            batteryCheck.text = "✓"
+            batteryCheck.setTextColor(Color.rgb(76, 175, 80))
+            batteryButton.visibility = View.GONE
+        } else {
+            batteryCheck.text = "·"
+            batteryCheck.setTextColor(Color.GRAY)
+            batteryButton.visibility = View.VISIBLE
+        }
 
         statusView.text = buildString {
             appendLine("Service: ${if (SyncState.serviceRunning) "running" else "stopped"}")
