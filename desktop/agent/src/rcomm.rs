@@ -105,23 +105,40 @@ pub fn hostname() -> String {
 
 /// Scans the paired Bluetooth devices for one advertising the R-Board sync
 /// service and returns its address. Slow (uncached SDP query per device).
+/// The uncached SDP query is flaky (sometimes returns empty, 0x80070490 on
+/// connect), so every device is queried up to three times and everything is
+/// logged to make remote diagnosis possible.
 pub fn discover_paired_phone() -> Result<Option<u64>> {
     let selector = BluetoothDevice::GetDeviceSelectorFromPairingState(true)?;
     let devices = DeviceInformation::FindAllAsyncAqsFilter(&selector)?.rwait()?;
     let count = devices.Size()?;
+    crate::logln(&format!("search: {count} paired Bluetooth device(s) found"));
     for i in 0..count {
         let info = devices.GetAt(i)?;
+        let name = info.Name().unwrap_or_default().to_string();
         let device = match BluetoothDevice::FromIdAsync(&info.Id()?)?.rwait() {
             Ok(d) => d,
-            Err(_) => continue, // device gone between enumeration and query
+            Err(e) => {
+                crate::logln(&format!("search: {name}: gone while querying ({e})"));
+                continue; // device gone between enumeration and query
+            }
         };
         let address = device.BluetoothAddress()?;
         let service_id = RfcommServiceId::FromUuid(SERVICE_UUID)?;
-        let services = device
-            .GetRfcommServicesForIdWithCacheModeAsync(&service_id, BluetoothCacheMode::Uncached)?
-            .rwait()?;
-        if services.Services()?.Size()? > 0 {
-            return Ok(Some(address));
+        for attempt in 1..=3 {
+            let services = device
+                .GetRfcommServicesForIdWithCacheModeAsync(&service_id, BluetoothCacheMode::Uncached)?
+                .rwait()?;
+            let found = services.Services()?.Size()?;
+            if found > 0 {
+                crate::logln(&format!("search: {name} advertises the sync service"));
+                return Ok(Some(address));
+            }
+            if attempt < 3 {
+                thread::sleep(Duration::from_millis(1500));
+            } else {
+                crate::logln(&format!("search: {name} ({address:012X}): no sync service after 3 queries"));
+            }
         }
     }
     Ok(None)

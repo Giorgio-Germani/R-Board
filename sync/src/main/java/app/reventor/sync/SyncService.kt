@@ -132,6 +132,7 @@ class SyncService : Service() {
 
     private suspend fun acceptLoop(): Unit = coroutineScope {
         SyncState.statusLine = "Waiting for desktop…"
+        var busy = false
         while (isActive) {
             val adapter = btAdapter
             if (adapter == null || !adapter.isEnabled) {
@@ -141,8 +142,10 @@ class SyncService : Service() {
             val server = try {
                 adapter.listenUsingRfcommWithServiceRecord("R-Board Clipboard Sync", SERVICE_UUID)
             } catch (e: SecurityException) {
+                // transient (e.g. BT just re-enabled) — retry, never stop advertising
                 Log.w(TAG, "listen blocked by permission", e)
-                break
+                delay(3000)
+                continue
             } catch (e: IOException) {
                 delay(3000)
                 continue
@@ -153,8 +156,22 @@ class SyncService : Service() {
                 try { server.close() } catch (_: IOException) {}
                 continue
             }
-            try { server.close() } catch (_: IOException) {}
-            serve(socket)
+            // keep the listening socket open: the SDP record must stay advertised
+            // while a client is being served, otherwise a second computer cannot
+            // even discover the phone
+            if (busy) {
+                // one session at a time — reject instead of silently stealing
+                try { socket.close() } catch (_: IOException) {}
+                continue
+            }
+            busy = true
+            launch {
+                try {
+                    serve(socket)
+                } finally {
+                    busy = false
+                }
+            }
         }
     }
 
