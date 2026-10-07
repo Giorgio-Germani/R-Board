@@ -56,6 +56,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
 import helium314.keyboard.latin.R
+import helium314.keyboard.latin.settings.Defaults
 import helium314.keyboard.latin.utils.JniUtils
 import helium314.keyboard.latin.utils.MissingDictionaryDialog
 import helium314.keyboard.latin.utils.SubtypeLocaleUtils.displayName
@@ -154,65 +155,71 @@ fun WelcomeWizard(
         val subtypes = remember { getSortedSubtypes(ctx) }
         var revision by rememberSaveable { mutableIntStateOf(0) } // force list recomposition on toggle
         var noDictSubtype by remember { mutableStateOf<InputMethodSubtype?>(null) }
-        StepNumbers(3)
-        Column(Modifier
-            .background(color = stepBackgroundColor)
-            .padding(16.dp)
-        ) {
-            Text(stringResource(R.string.setup_step_languages_title))
-            Text(
-                stringResource(R.string.setup_step_languages_instruction),
-                style = MaterialTheme.typography.bodyLarge.merge(color = textColor)
-            )
-        }
-        Spacer(Modifier.height(4.dp))
-        Column(
-            Modifier
+        // materialize implicit system-locale defaults, so the checkboxes reflect what is actually enabled
+        if (ctx.prefs().getString(helium314.keyboard.latin.settings.Settings.PREF_ENABLED_SUBTYPES, Defaults.PREF_ENABLED_SUBTYPES)!!.isEmpty())
+            SubtypeSettings.getEnabledSubtypes(true).forEach { SubtypeSettings.addEnabledSubtype(ctx.prefs(), it) }
+        Column(Modifier.fillMaxWidth().verticalScroll(rememberScrollState())) {
+            StepNumbers(3)
+            Column(Modifier
                 .background(color = stepBackgroundColor)
-                .heightIn(max = 320.dp)
-                .verticalScroll(rememberScrollState())
-        ) {
-            key(revision) {
-                subtypes.forEach { subtype ->
-                    val enabled = SubtypeSettings.isEnabled(subtype)
-                    Row(
-                        Modifier
-                            .fillMaxWidth()
-                            .clickable {
-                                if (enabled) {
-                                    SubtypeSettings.removeEnabledSubtype(ctx, subtype)
-                                } else {
-                                    if (!dictsAvailable(subtype.locale(), ctx))
-                                        noDictSubtype = subtype
-                                    SubtypeSettings.addEnabledSubtype(ctx.prefs(), subtype)
+                .padding(16.dp)
+            ) {
+                Text(stringResource(R.string.setup_step_languages_title))
+                Text(
+                    stringResource(R.string.setup_step_languages_instruction),
+                    style = MaterialTheme.typography.bodyLarge.merge(color = textColor)
+                )
+            }
+            Spacer(Modifier.height(4.dp))
+            Column(
+                Modifier
+                    .background(color = stepBackgroundColor)
+                    .fillMaxWidth()
+                    .heightIn(max = 320.dp)
+                    .verticalScroll(rememberScrollState())
+            ) {
+                key(revision) {
+                    subtypes.forEach { subtype ->
+                        val enabled = SubtypeSettings.isEnabled(subtype)
+                        Row(
+                            Modifier
+                                .fillMaxWidth()
+                                .clickable {
+                                    if (enabled) {
+                                        SubtypeSettings.removeEnabledSubtype(ctx, subtype)
+                                    } else {
+                                        if (!dictsAvailable(subtype.locale(), ctx))
+                                            noDictSubtype = subtype
+                                        SubtypeSettings.addEnabledSubtype(ctx.prefs(), subtype)
+                                    }
+                                    revision++
                                 }
-                                revision++
-                            }
-                            .padding(horizontal = 16.dp, vertical = 2.dp),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Checkbox(checked = enabled, onCheckedChange = null)
-                        Text(subtype.displayName(), Modifier.weight(1f), style = MaterialTheme.typography.bodyLarge)
+                                .padding(horizontal = 16.dp, vertical = 2.dp),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Checkbox(checked = enabled, onCheckedChange = null)
+                            Text(subtype.displayName(), Modifier.weight(1f), style = MaterialTheme.typography.bodyLarge)
+                        }
                     }
                 }
             }
+            Spacer(Modifier.height(4.dp))
+            Row(
+                Modifier.clickable { step = 4 }
+                    .background(color = stepBackgroundColor)
+                    .padding(16.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Icon(
+                    painterResource(R.drawable.ic_arrow_left),
+                    null,
+                    Modifier.padding(end = 6.dp).size(32.dp).rotate(180f), // ic_arrow_right is a rotate-drawable, not usable with painterResource
+                    tint = textColor
+                )
+                Text(stringResource(R.string.setup_step_languages_action), Modifier.weight(1f))
+            }
         }
         noDictSubtype?.let { MissingDictionaryDialog({ noDictSubtype = null }, it.locale()) }
-        Spacer(Modifier.height(4.dp))
-        Row(
-            Modifier.clickable { step = 4 }
-                .background(color = stepBackgroundColor)
-                .padding(16.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Icon(
-                painterResource(R.drawable.ic_arrow_left),
-                null,
-                Modifier.padding(end = 6.dp).size(32.dp).rotate(180f), // ic_arrow_right is a rotate-drawable, not usable with painterResource
-                tint = textColor
-            )
-            Text(stringResource(R.string.setup_step_languages_action), Modifier.weight(1f))
-        }
     }
     @Composable fun steps() {
         if (step == 0)
