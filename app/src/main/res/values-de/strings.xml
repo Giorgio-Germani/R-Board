@@ -552,13 +552,12 @@
     <string name="show_dpad_key">Steuerkreuztaste</string>
     <string name="recent_emojis_cleared">Zuletzt verwendete Emojis gelöscht</string>
     <string name="choose_own_color">Wähle deine eigene Farbe</string>
-    <string name="choose_own_color_description">Farben für Hintergrund, Tasten, Funktionstasten, Eingabetaste, obere Leiste und Text, mit Live-Vorschau</string>
+    <string name="choose_own_color_description">Farben für Hintergrund, Tasten, Funktionstasten, Eingabetaste und Text, mit Live-Vorschau</string>
     <string name="two_color_background_short">Hintergrund</string>
     <string name="two_color_text_short">Text</string>
     <string name="two_color_keys_short">Tasten</string>
     <string name="two_color_functional_short">Funktionstasten</string>
     <string name="two_color_action_short">Eingabetaste</string>
-    <string name="two_color_toolbar_short">Obere Leiste</string>
     <string name="two_color_preview">Vorschau</string>
     <string name="two_color_background">Hintergrundfarbe der Tastatur (Zwei-Farben-Modus)</string>
     <string name="two_color_text">Textfarbe der Tasten (Zwei-Farben-Modus)</string>

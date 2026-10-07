@@ -67,13 +67,12 @@ private const val SLOT_BACKGROUND = 0
 private const val SLOT_KEYS = 1
 private const val SLOT_FUNCTIONAL = 2
 private const val SLOT_ACTION = 3
-private const val SLOT_TOOLBAR = 4
-private const val SLOT_TEXT = 5
+private const val SLOT_TEXT = 4
 
 /** "Wähle deine eigene Farbe": keyboard background, letter key background, functional key
- *  background, action (enter/search) key background, top bar background and key text color,
- *  with a live preview that matches the real keyboard. Unset surfaces derive from the
- *  background, so existing two-color setups keep working. */
+ *  background, action (enter/search) key background and key text color, with a live preview
+ *  that matches the real keyboard. The top bar always follows the keyboard background; other
+ *  unset surfaces derive from it, so existing two-color setups keep working. */
 @Composable
 fun TwoColorPickerDialog(
     prefs: android.content.SharedPreferences,
@@ -85,7 +84,7 @@ fun TwoColorPickerDialog(
     val current = KeyboardTheme.getCustomColors(prefs)
     var colors by remember {
         mutableStateOf(
-            if (current.size == 6) current.toList()
+            if (current.size == 5) current.toList()
             else listOf(
                 initialBg ?: PRESET_PAIRS.first().first,
                 initialText ?: PRESET_PAIRS.first().second
@@ -121,7 +120,6 @@ fun TwoColorPickerDialog(
                     putString(KeyboardTheme.PREF_TWO_COLOR_KEYS, colors[SLOT_KEYS].toString())
                     putString(KeyboardTheme.PREF_TWO_COLOR_FUNCTIONAL, colors[SLOT_FUNCTIONAL].toString())
                     putString(KeyboardTheme.PREF_TWO_COLOR_ACTION, colors[SLOT_ACTION].toString())
-                    putString(KeyboardTheme.PREF_TWO_COLOR_TOOLBAR, colors[SLOT_TOOLBAR].toString())
                 }
                 onApply(colors[SLOT_BACKGROUND], colors[SLOT_TEXT])
                 onDismiss()
@@ -135,7 +133,7 @@ fun TwoColorPickerDialog(
                     remove(KeyboardTheme.PREF_TWO_COLOR_KEYS)
                     remove(KeyboardTheme.PREF_TWO_COLOR_FUNCTIONAL)
                     remove(KeyboardTheme.PREF_TWO_COLOR_ACTION)
-                    remove(KeyboardTheme.PREF_TWO_COLOR_TOOLBAR)
+                    remove(KeyboardTheme.PREF_TWO_COLOR_TOOLBAR) // deprecated, top bar follows the background now
                 }
                 onApply(null, null)
                 onDismiss()
@@ -149,7 +147,6 @@ fun TwoColorPickerDialog(
                     SLOT_KEYS to R.string.two_color_keys_short,
                     SLOT_FUNCTIONAL to R.string.two_color_functional_short,
                     SLOT_ACTION to R.string.two_color_action_short,
-                    SLOT_TOOLBAR to R.string.two_color_toolbar_short,
                     SLOT_TEXT to R.string.two_color_text_short,
                 ).chunked(3).forEach { rowSlots ->
                     Row(horizontalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.padding(bottom = 8.dp)) {
@@ -259,7 +256,7 @@ fun TwoColorPickerDialog(
                     AllColors(
                         KeyboardTheme.customColorMap(
                             colors[SLOT_BACKGROUND], colors[SLOT_KEYS], colors[SLOT_FUNCTIONAL],
-                            colors[SLOT_ACTION], colors[SLOT_TOOLBAR], colors[SLOT_TEXT]
+                            colors[SLOT_ACTION], colors[SLOT_TEXT]
                         ),
                         prefs.getString(Settings.PREF_THEME_STYLE, Defaults.PREF_THEME_STYLE)!!,
                         prefs.getBoolean(Settings.PREF_THEME_KEY_BORDERS, Defaults.PREF_THEME_KEY_BORDERS),
@@ -275,5 +272,5 @@ fun TwoColorPickerDialog(
 private fun deriveFromPair(bg: Int, text: Int): List<Int> {
     val surface = if (ColorUtils.calculateLuminance(bg) < 0.5) 0xFFFFFFFF.toInt() else 0xFF000000.toInt()
     fun blend(f: Float) = ColorUtils.blendARGB(bg, surface, f)
-    return listOf(bg, blend(0.16f), blend(0.08f), blend(0.08f), bg, text)
+    return listOf(bg, blend(0.16f), blend(0.08f), blend(0.08f), text)
 }

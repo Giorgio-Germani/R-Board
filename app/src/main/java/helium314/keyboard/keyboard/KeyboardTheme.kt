@@ -151,9 +151,10 @@ private constructor(val themeId: Int, @JvmField val mStyleId: Int) {
     const val PREF_TWO_COLOR_ACTION = "two_color_action"
     const val PREF_TWO_COLOR_TOOLBAR = "two_color_toolbar"
 
-    /** the six user-settable colors of the custom color mode: keyboard background, letter key
-     *  background, functional key background, action (enter/search) key background, toolbar
-     *  (top bar) background and key text color. Unset surfaces derive from the background. */
+    /** the user-settable colors of the custom color mode: keyboard background, letter key
+     *  background, functional key background, action (enter/search) key background and key
+     *  text color. The top bar always follows the keyboard background; other unset surfaces
+     *  derive from the background. */
     fun getCustomColors(prefs: SharedPreferences): IntArray {
         val bg = prefs.getString(PREF_TWO_COLOR_BACKGROUND, null)?.toIntOrNull() ?: return intArrayOf()
         val text = prefs.getString(PREF_TWO_COLOR_TEXT, null)?.toIntOrNull() ?: return intArrayOf()
@@ -163,8 +164,7 @@ private constructor(val themeId: Int, @JvmField val mStyleId: Int) {
         val keyBg = prefs.getString(PREF_TWO_COLOR_KEYS, null)?.toIntOrNull() ?: blend(surface, 0.16f)
         val functionalBg = prefs.getString(PREF_TWO_COLOR_FUNCTIONAL, null)?.toIntOrNull() ?: blend(surface, 0.08f)
         val actionBg = prefs.getString(PREF_TWO_COLOR_ACTION, null)?.toIntOrNull() ?: functionalBg
-        val toolbar = prefs.getString(PREF_TWO_COLOR_TOOLBAR, null)?.toIntOrNull() ?: bg
-        return intArrayOf(bg, keyBg, functionalBg, actionBg, toolbar, text)
+        return intArrayOf(bg, keyBg, functionalBg, actionBg, text)
     }
 
     /* product decision: the user picks the colors above; everything else derives from them.
@@ -173,11 +173,11 @@ private constructor(val themeId: Int, @JvmField val mStyleId: Int) {
     private fun applyTwoColorMode(colors: Colors, prefs: SharedPreferences): Colors {
         val custom = getCustomColors(prefs)
         if (custom.isEmpty()) return colors
-        val map = customColorMap(custom[0], custom[1], custom[2], custom[3], custom[4], custom[5])
+        val map = customColorMap(custom[0], custom[1], custom[2], custom[3], custom[4])
         return AllColors(map, colors.themeStyle, colors.hasKeyBorders, null)
     }
 
-    fun customColorMap(bg: Int, keyBg: Int, functionalBg: Int, actionBg: Int, toolbar: Int, text: Int): EnumMap<ColorType, Int> {
+    fun customColorMap(bg: Int, keyBg: Int, functionalBg: Int, actionBg: Int, text: Int): EnumMap<ColorType, Int> {
         val map = EnumMap<ColorType, Int>(ColorType::class.java)
         // derived surfaces move away from their base color: lighter on a dark background, darker on a bright one
         val surface = if (androidx.core.graphics.ColorUtils.calculateLuminance(bg) < 0.5) 0xFFFFFFFF.toInt() else 0xFF000000.toInt()
@@ -185,9 +185,8 @@ private constructor(val themeId: Int, @JvmField val mStyleId: Int) {
         fun textBlend(f: Float) = androidx.core.graphics.ColorUtils.blendARGB(text, bg, f)
         for (colorType in ColorType.entries) {
             map[colorType] = when (colorType) {
-                ColorType.MAIN_BACKGROUND, ColorType.NAVIGATION_BAR,
+                ColorType.MAIN_BACKGROUND, ColorType.STRIP_BACKGROUND, ColorType.NAVIGATION_BAR,
                     ColorType.MORE_SUGGESTIONS_WORD_BACKGROUND, ColorType.ONE_HANDED_MODE_BUTTON -> bg
-                ColorType.STRIP_BACKGROUND -> toolbar
                 ColorType.KEY_BACKGROUND, ColorType.CLIPBOARD_SUGGESTION_BACKGROUND,
                     ColorType.TOOL_BAR_EXPAND_KEY_BACKGROUND, ColorType.SPACE_BAR_BACKGROUND -> keyBg
                 ColorType.FUNCTIONAL_KEY_BACKGROUND, ColorType.EMOJI_SEARCH_BACKGROUND,
