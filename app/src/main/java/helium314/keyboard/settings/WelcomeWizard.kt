@@ -45,6 +45,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.platform.LocalContext
@@ -205,9 +206,9 @@ fun WelcomeWizard(
             verticalAlignment = Alignment.CenterVertically
         ) {
             Icon(
-                painterResource(R.drawable.ic_arrow_right),
+                painterResource(R.drawable.ic_arrow_left),
                 null,
-                Modifier.padding(end = 6.dp).size(32.dp),
+                Modifier.padding(end = 6.dp).size(32.dp).rotate(180f), // ic_arrow_right is a rotate-drawable, not usable with painterResource
                 tint = textColor
             )
             Text(stringResource(R.string.setup_step_languages_action), Modifier.weight(1f))

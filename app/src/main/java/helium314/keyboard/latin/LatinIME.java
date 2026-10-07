@@ -42,6 +42,7 @@ import helium314.keyboard.event.HapticEvent;
 import android.inputmethodservice.InputMethodService;
 import app.reventor.dictation.DictationController;
 import app.reventor.sync.SyncAutoStart;
+import helium314.keyboard.keyboard.Key;
 import helium314.keyboard.keyboard.KeyboardActionListener;
 import helium314.keyboard.keyboard.KeyboardActionListenerImpl;
 import helium314.keyboard.keyboard.KeyboardMode;
@@ -1425,12 +1426,20 @@ public class LatinIME extends InputMethodService implements
         return mDictationController;
     }
 
-    /** hands the current theme colors to the dictation recording overlay */
+    /** hands the current theme colors and the letter-row boundary to the dictation overlay */
     public void passDictationColors() {
         final Colors colors = mSettings.getCurrent().mColors;
+        int letterAreaHeight = 0;
+        final Keyboard keyboard = mKeyboardSwitcher.getKeyboard();
+        if (keyboard != null) {
+            final Key voiceKey = keyboard.getKey(KeyCode.VOICE_INPUT);
+            if (voiceKey != null)
+                letterAreaHeight = voiceKey.getY(); // top edge of the bottom row
+        }
         getDictation().setColors(
                 colors.get(ColorType.MAIN_BACKGROUND),
-                colors.get(ColorType.ACTION_KEY_BACKGROUND));
+                colors.get(ColorType.ACTION_KEY_BACKGROUND),
+                letterAreaHeight);
     }
 
     public void onEvent(@NonNull final Event event) {

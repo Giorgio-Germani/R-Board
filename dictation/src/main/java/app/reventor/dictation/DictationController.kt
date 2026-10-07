@@ -49,6 +49,7 @@ class DictationController(private val ime: InputMethodService) {
     private var overlay: RecordingOverlay? = null
     @Volatile private var themeBackground = 0xFF16191E.toInt()
     @Volatile private var themeCircle = 0xFF3D5AFE.toInt()
+    @Volatile private var letterAreaHeight = 0
 
     // gesture bookkeeping between press / release / tap events
     @Volatile
@@ -65,10 +66,11 @@ class DictationController(private val ime: InputMethodService) {
     @Volatile
     private var sessionActive = false
 
-    /** Theme colors for the recording overlay (keyboard background / enter-key color). */
-    fun setColors(background: Int, circle: Int) {
+    /** Theme colors + the pixel height of the letter rows for the recording overlay. */
+    fun setColors(background: Int, circle: Int, letterArea: Int) {
         themeBackground = background
         themeCircle = circle
+        letterAreaHeight = letterArea
     }
 
     private fun showOverlay() {
@@ -88,8 +90,8 @@ class DictationController(private val ime: InputMethodService) {
             main.postDelayed({ showOverlay() }, 100)
             return@post
         }
-        Log.d(TAG, "overlay anchored to keyboard view ${kbView.width}x${kbView.height}")
-        val ov = RecordingOverlay(ime, themeBackground, themeCircle, kbView.width, kbView.height)
+        Log.d(TAG, "overlay anchored to keyboard view ${kbView.width}x${kbView.height}, letter area $letterAreaHeight")
+        val ov = RecordingOverlay(ime, themeBackground, themeCircle, kbView.width, kbView.height, letterAreaHeight)
         kbParent.addView(ov, kbParent.indexOfChild(kbView) + 1, android.widget.FrameLayout.LayoutParams(kbView.width, kbView.height))
         overlay = ov
         ov.visibility = View.VISIBLE
