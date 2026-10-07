@@ -625,6 +625,12 @@ language, hence "No language". -->
     <string name="setup_step2_instruction">"Next, select \"%s\" as your active text-input method."</string>
     <!-- The label of the button that triggers the choose input method dialog in order to select the keyboard. -->
     <string name="setup_step2_action">Switch input methods</string>
+    <!-- Title of the language selection step in the setup wizard. -->
+    <string name="setup_step_languages_title">Choose your languages</string>
+    <!-- Detailed instruction of the language selection step in the setup wizard. -->
+    <string name="setup_step_languages_instruction">Select the languages you want to type in. You can change them later in the keyboard settings.</string>
+    <!-- The label of the button that continues to the next setup wizard step. -->
+    <string name="setup_step_languages_action">Continue</string>
     <!-- Title of the 3rd step in the setup wizard. -->
     <string name="setup_step3_title">"Congratulations, you're all set!"</string>
     <!-- Detailed instruction of the 3rd step in the setup wizard. %s is the application name. -->

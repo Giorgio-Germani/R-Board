@@ -71,31 +71,33 @@ class DictationController(private val ime: InputMethodService) {
         themeCircle = circle
     }
 
-    private fun showOverlay() = main.post {
-        if (overlay != null) return@post
+    private fun showOverlay() {
+        main.post {
+        val existing = overlay
+        if (existing != null) {
+            existing.visibility = View.VISIBLE
+            return@post
+        }
         val content = ime.window?.findViewById(android.R.id.content) as? android.view.ViewGroup
             ?: return@post
-        val ov = RecordingOverlay(ime, themeBackground, themeCircle)
-        // cover exactly the key rows (QWERTY .. spacebar row), not the whole display
         val kbId = ime.resources.getIdentifier("keyboard_view", "id", ime.packageName)
         val kbView = if (kbId != 0) content.findViewById<View>(kbId) else null
         val kbParent = kbView?.parent as? android.view.ViewGroup
-        if (kbView != null && kbParent != null) {
-            kbParent.addView(ov, kbParent.indexOfChild(kbView) + 1, kbView.layoutParams)
-        } else {
-            content.addView(
-                ov,
-                android.view.ViewGroup.LayoutParams.MATCH_PARENT,
-                android.view.ViewGroup.LayoutParams.MATCH_PARENT
-            )
+        if (kbView == null || kbParent == null || kbView.width == 0 || kbView.height == 0) {
+            // keyboard not laid out yet — retry shortly
+            main.postDelayed({ showOverlay() }, 100)
+            return@post
         }
+        Log.d(TAG, "overlay anchored to keyboard view ${kbView.width}x${kbView.height}")
+        val ov = RecordingOverlay(ime, themeBackground, themeCircle, kbView.width, kbView.height)
+        kbParent.addView(ov, kbParent.indexOfChild(kbView) + 1, android.widget.FrameLayout.LayoutParams(kbView.width, kbView.height))
         overlay = ov
+        ov.visibility = View.VISIBLE
+        }
     }
 
-    private fun hideOverlay() = main.post {
-        overlay?.stopAnimating()
-        (overlay?.parent as? android.view.ViewGroup)?.removeView(overlay)
-        overlay = null
+    private fun hideOverlay() {
+        main.post { overlay?.visibility = View.INVISIBLE }
     }
 
     /** Key-down on the layout voice key: start push-to-talk. */

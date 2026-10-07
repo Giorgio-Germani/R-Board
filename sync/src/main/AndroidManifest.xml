@@ -21,7 +21,7 @@
         <activity
             android:name=".SyncSetupActivity"
             android:exported="true"
-            android:label="REVENTOR Sync"
+            android:label="REVENTOR Clipboard Sync"
             android:theme="@style/Theme.AppCompat.DayNight.NoActionBar" />
 
         <receiver

@@ -5,14 +5,21 @@ import android.content.ClipboardManager
 import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
 import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.MaterialTheme
@@ -30,17 +37,21 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import helium314.keyboard.keyboard.ColorSetting
 import helium314.keyboard.keyboard.KeyboardSwitcher
 import helium314.keyboard.keyboard.KeyboardTheme
 import helium314.keyboard.latin.R
 import helium314.keyboard.latin.common.ColorType
+import helium314.keyboard.latin.common.Colors
 import helium314.keyboard.latin.common.Links
 import helium314.keyboard.latin.common.decodeBase36
 import helium314.keyboard.latin.settings.Defaults
@@ -120,7 +131,7 @@ fun ColorThemePickerDialog(
                         if (item == "") {
                             AddColorRow(onDismissRequest, userColors, targetScreen, setting.key)
                         } else {
-                            ColorItemRow(onDismissRequest, item, item == selectedColor, item in userColors, targetScreen, setting.key)
+                            ColorItemRow(onDismissRequest, item, item == selectedColor, item in userColors, targetScreen, setting.key, isNight)
                         }
                     }
                 }
@@ -199,7 +210,7 @@ private fun AddColorRow(onDismissRequest: () -> Unit, userColors: Collection<Str
 }
 
 @Composable
-private fun ColorItemRow(onDismissRequest: () -> Unit, item: String, isSelected: Boolean, isUser: Boolean, targetScreen: String, prefKey: String) {
+private fun ColorItemRow(onDismissRequest: () -> Unit, item: String, isSelected: Boolean, isUser: Boolean, targetScreen: String, prefKey: String, isNight: Boolean) {
     val ctx = LocalContext.current
     val prefs = ctx.prefs()
     // preview what the keyboard will look like with this color theme
@@ -208,7 +219,7 @@ private fun ColorItemRow(onDismissRequest: () -> Unit, item: String, isSelected:
             KeyboardTheme.getThemeColors(
                 item,
                 prefs.getString(Settings.PREF_THEME_STYLE, Defaults.PREF_THEME_STYLE)!!,
-                ctx, prefs, targetScreen == SettingsDestination.ColorsNight
+                ctx, prefs, isNight
             )
         }.getOrNull()
     }

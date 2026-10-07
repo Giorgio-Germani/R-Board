@@ -74,6 +74,9 @@
     <string name="setup_step2_title">Zu %s wechseln</string>
     <string name="setup_step2_instruction">Wähle als nächstes „%s“ als deine aktive Bildschirmtastatur.</string>
     <string name="setup_step2_action">"Eingabemethode wechseln"</string>
+    <string name="setup_step_languages_title">Sprachen auswählen</string>
+    <string name="setup_step_languages_instruction">Wähle die Sprachen, in denen du schreiben möchtest. Du kannst sie später in den Tastatur-Einstellungen ändern.</string>
+    <string name="setup_step_languages_action">"Weiter"</string>
     <string name="setup_step3_title">Hurra, die Einrichtung ist abgeschlossen!</string>
     <string name="setup_step3_instruction">Jetzt kannst du in all deinen Lieblingsapps mit %s schreiben.</string>
     <string name="setup_finish_action">"Fertig"</string>

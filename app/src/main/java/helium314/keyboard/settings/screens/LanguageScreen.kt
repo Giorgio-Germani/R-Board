@@ -124,14 +124,14 @@ private fun SubtypeRow(subtype: InputMethodSubtype, isEnabled: Boolean) {
     }
 }
 
-private fun dictsAvailable(locale: Locale, context: Context): Boolean {
+fun dictsAvailable(locale: Locale, context: Context): Boolean {
     if (locale.language == SubtypeLocaleUtils.NO_LANGUAGE) return true // incorrect, but we don't want to show the dialog for "no language"
     val (dicts, hasInternal) = getUserAndInternalDictionaries(context, locale)
     return hasInternal || dicts.isNotEmpty()
 }
 
 // sorting by display name is still slow, even with the cache... but probably good enough
-private fun getSortedSubtypes(context: Context): List<InputMethodSubtype> {
+fun getSortedSubtypes(context: Context): List<InputMethodSubtype> {
     val availableSubtypes = SubtypeSettings.getAllAvailableSubtypes()
     val availableLocales = availableSubtypes.mapTo(HashSet()) { it.locale() }
     val systemLocales = SubtypeSettings.getSystemLocales().map {

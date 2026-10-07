@@ -5,6 +5,7 @@ import android.content.Context
 import android.content.Intent
 import android.provider.Settings
 import android.view.inputmethod.InputMethodManager
+import android.view.inputmethod.InputMethodSubtype
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
@@ -19,8 +20,12 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.Checkbox
 import androidx.compose.material3.Icon
 import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.LocalTextStyle
@@ -31,7 +36,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
@@ -48,9 +56,16 @@ import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
 import helium314.keyboard.latin.R
 import helium314.keyboard.latin.utils.JniUtils
+import helium314.keyboard.latin.utils.MissingDictionaryDialog
+import helium314.keyboard.latin.utils.SubtypeLocaleUtils.displayName
+import helium314.keyboard.latin.utils.SubtypeSettings
 import helium314.keyboard.latin.utils.Theme
 import helium314.keyboard.latin.utils.UncachedInputMethodManagerUtils
+import helium314.keyboard.latin.utils.locale
+import helium314.keyboard.latin.utils.prefs
 import helium314.keyboard.latin.utils.previewDark
+import helium314.keyboard.settings.screens.dictsAvailable
+import helium314.keyboard.settings.screens.getSortedSubtypes
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -104,12 +119,16 @@ fun WelcomeWizard(
         }
     }
     @Composable
-    fun ColumnScope.Step(step: Int, title: String, instruction: String, actionText: String, icon: Painter, action: () -> Unit) {
+    fun StepNumbers(current: Int) {
         Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-            Text("1", color = if (step == 1) titleColor else textColorDim)
-            Text("2", color = if (step == 2) titleColor else textColorDim)
-            Text("3", color = if (step == 3) titleColor else textColorDim)
+            listOf(1, 2, 3, 4).forEach {
+                Text(it.toString(), color = if (current == it) titleColor else textColorDim)
+            }
         }
+    }
+    @Composable
+    fun ColumnScope.Step(step: Int, title: String, instruction: String, actionText: String, icon: Painter, action: () -> Unit) {
+        StepNumbers(step)
         Column(Modifier
             .background(color = stepBackgroundColor)
             .padding(16.dp)
@@ -126,6 +145,72 @@ fun WelcomeWizard(
         ) {
             Icon(icon, null, Modifier.padding(end = 6.dp).size(32.dp), tint = textColor)
             Text(actionText, Modifier.weight(1f))
+        }
+    }
+    // step 3: choose the enabled input languages right in the wizard
+    @Composable
+    fun LanguageStep() {
+        val subtypes = remember { getSortedSubtypes(ctx) }
+        var revision by rememberSaveable { mutableIntStateOf(0) } // force list recomposition on toggle
+        var noDictSubtype by remember { mutableStateOf<InputMethodSubtype?>(null) }
+        StepNumbers(3)
+        Column(Modifier
+            .background(color = stepBackgroundColor)
+            .padding(16.dp)
+        ) {
+            Text(stringResource(R.string.setup_step_languages_title))
+            Text(
+                stringResource(R.string.setup_step_languages_instruction),
+                style = MaterialTheme.typography.bodyLarge.merge(color = textColor)
+            )
+        }
+        Spacer(Modifier.height(4.dp))
+        Column(
+            Modifier
+                .background(color = stepBackgroundColor)
+                .heightIn(max = 320.dp)
+                .verticalScroll(rememberScrollState())
+        ) {
+            key(revision) {
+                subtypes.forEach { subtype ->
+                    val enabled = SubtypeSettings.isEnabled(subtype)
+                    Row(
+                        Modifier
+                            .fillMaxWidth()
+                            .clickable {
+                                if (enabled) {
+                                    SubtypeSettings.removeEnabledSubtype(ctx, subtype)
+                                } else {
+                                    if (!dictsAvailable(subtype.locale(), ctx))
+                                        noDictSubtype = subtype
+                                    SubtypeSettings.addEnabledSubtype(ctx.prefs(), subtype)
+                                }
+                                revision++
+                            }
+                            .padding(horizontal = 16.dp, vertical = 2.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Checkbox(checked = enabled, onCheckedChange = null)
+                        Text(subtype.displayName(), Modifier.weight(1f), style = MaterialTheme.typography.bodyLarge)
+                    }
+                }
+            }
+        }
+        noDictSubtype?.let { MissingDictionaryDialog({ noDictSubtype = null }, it.locale()) }
+        Spacer(Modifier.height(4.dp))
+        Row(
+            Modifier.clickable { step = 4 }
+                .background(color = stepBackgroundColor)
+                .padding(16.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Icon(
+                painterResource(R.drawable.ic_arrow_right),
+                null,
+                Modifier.padding(end = 6.dp).size(32.dp),
+                tint = textColor
+            )
+            Text(stringResource(R.string.setup_step_languages_action), Modifier.weight(1f))
         }
     }
     @Composable fun steps() {
@@ -173,7 +258,9 @@ fun WelcomeWizard(
                         )
                         Text(stringResource(R.string.setup_step3_action), Modifier.weight(1f))
                     }
-                } else { // step 3
+                } else if (step == 3) {
+                    LanguageStep()
+                } else { // step 4
                     Step(
                         step,
                         stringResource(R.string.setup_step3_title),
