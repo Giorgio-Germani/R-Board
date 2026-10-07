@@ -417,8 +417,12 @@ sealed interface KeyData : AbstractKeyData {
             KeyLabel.ACTION -> return Key.BACKGROUND_TYPE_ACTION
             KeyLabel.SHIFT -> return Key.BACKGROUND_TYPE_FUNCTIONAL
         }
-        // the voice input key should look like the other functional keys (emoji etc.)
-        if (code == KeyCode.VOICE_INPUT) return Key.BACKGROUND_TYPE_FUNCTIONAL
+        // the voice input key should look like the other functional keys (emoji etc.).
+        // the code check alone is not enough: the dedicated mic key in functional_keys.json
+        // carries its code in the label (!code/...), which is only parsed later by KeySpecParser
+        if (code == KeyCode.VOICE_INPUT
+            || label.substringAfter(KeyboardCodesSet.PREFIX_CODE, "") == "key_voice_input")
+            return Key.BACKGROUND_TYPE_FUNCTIONAL
         if (type == KeyType.PLACEHOLDER) return Key.BACKGROUND_TYPE_EMPTY
         if ((params.mId.element == KeyboardElement.SYMBOLS || params.mId.element == KeyboardElement.SYMBOLS_SHIFTED)
                 && (groupId == GROUP_COMMA || groupId == GROUP_PERIOD))

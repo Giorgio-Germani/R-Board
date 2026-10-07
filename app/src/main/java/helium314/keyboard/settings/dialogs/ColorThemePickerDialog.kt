@@ -5,21 +5,16 @@ import android.content.ClipboardManager
 import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
 import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.MaterialTheme
@@ -37,21 +32,16 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import helium314.keyboard.keyboard.ColorSetting
 import helium314.keyboard.keyboard.KeyboardSwitcher
 import helium314.keyboard.keyboard.KeyboardTheme
 import helium314.keyboard.latin.R
-import helium314.keyboard.latin.common.ColorType
-import helium314.keyboard.latin.common.Colors
 import helium314.keyboard.latin.common.Links
 import helium314.keyboard.latin.common.decodeBase36
 import helium314.keyboard.latin.settings.Defaults
@@ -71,7 +61,9 @@ import helium314.keyboard.latin.utils.Theme
 import helium314.keyboard.settings.filePicker
 import helium314.keyboard.latin.utils.previewDark
 import helium314.keyboard.settings.screens.SaveThoseColors
+import helium314.keyboard.settings.KeyboardThemePreview
 import helium314.keyboard.settings.contentTextDirectionStyle
+import helium314.keyboard.latin.common.ColorType
 import kotlinx.coroutines.launch
 import kotlinx.serialization.SerializationException
 import kotlinx.serialization.json.Json
@@ -283,100 +275,6 @@ private fun ColorItemRow(onDismissRequest: () -> Unit, item: String, isSelected:
     }
 }
 
-/** small stylized keyboard rendering using the colors of the theme, so the user can see the result before choosing */
-@Composable
-private fun KeyboardThemePreview(colors: Colors) {
-    val keyShape = RoundedCornerShape(5.dp)
-    Column(
-        Modifier
-            .fillMaxWidth()
-            .padding(start = 48.dp, end = 12.dp, bottom = 10.dp)
-            .clip(RoundedCornerShape(10.dp))
-            .background(Color(colors.get(ColorType.MAIN_BACKGROUND)))
-            .padding(6.dp),
-        verticalArrangement = Arrangement.spacedBy(3.dp)
-    ) {
-        // toolbar with a few icons and the expand key
-        Row(
-            Modifier.fillMaxWidth().padding(vertical = 2.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            repeat(4) {
-                Box(Modifier.weight(1f), contentAlignment = Alignment.CenterStart) {
-                    Box(Modifier.size(7.dp).clip(CircleShape).background(Color(colors.get(ColorType.TOOL_BAR_KEY))))
-                }
-            }
-            Box(
-                Modifier
-                    .size(width = 12.dp, height = 10.dp)
-                    .clip(keyShape)
-                    .background(Color(colors.get(ColorType.TOOL_BAR_EXPAND_KEY_BACKGROUND))),
-                contentAlignment = Alignment.Center
-            ) {
-                Box(Modifier.size(4.dp).clip(CircleShape).background(Color(colors.get(ColorType.TOOL_BAR_EXPAND_KEY))))
-            }
-        }
-        listOf("qwertzuiop", "asdfghjklä", "⇧yxcvbnm⌫").forEach { row ->
-            Row(horizontalArrangement = Arrangement.spacedBy(3.dp)) {
-                row.forEach { ch ->
-                    val functional = ch == '⇧' || ch == '⌫'
-                    Box(
-                        Modifier
-                            .weight(1f)
-                            .clip(keyShape)
-                            .background(Color(colors.get(if (functional) ColorType.FUNCTIONAL_KEY_BACKGROUND else ColorType.KEY_BACKGROUND))),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Text(
-                            ch.toString(),
-                            color = Color(colors.get(if (functional) ColorType.FUNCTIONAL_KEY_TEXT else ColorType.KEY_TEXT)),
-                            fontSize = 10.sp,
-                            modifier = Modifier.padding(vertical = 5.dp)
-                        )
-                    }
-                }
-            }
-        }
-        Row(horizontalArrangement = Arrangement.spacedBy(3.dp)) {
-            Box(
-                Modifier.weight(1.6f).clip(keyShape)
-                    .background(Color(colors.get(ColorType.FUNCTIONAL_KEY_BACKGROUND))),
-                contentAlignment = Alignment.Center
-            ) {
-                Text(
-                    "?123",
-                    color = Color(colors.get(ColorType.FUNCTIONAL_KEY_TEXT)),
-                    fontSize = 9.sp,
-                    modifier = Modifier.padding(vertical = 5.dp)
-                )
-            }
-            Box(
-                Modifier.weight(4f).clip(keyShape)
-                    .background(Color(colors.get(ColorType.SPACE_BAR_BACKGROUND))),
-                contentAlignment = Alignment.Center
-            ) {
-                Text(
-                    "Deutsch",
-                    color = Color(colors.get(ColorType.SPACE_BAR_TEXT)),
-                    fontSize = 9.sp,
-                    modifier = Modifier.padding(vertical = 5.dp)
-                )
-            }
-            Box(
-                Modifier.weight(1.4f).clip(keyShape)
-                    .background(Color(colors.get(ColorType.ACTION_KEY_BACKGROUND))),
-                contentAlignment = Alignment.Center
-            ) {
-                Text(
-                    "⏎",
-                    color = Color(colors.get(ColorType.ACTION_KEY_ICON)),
-                    fontSize = 10.sp,
-                    modifier = Modifier.padding(vertical = 5.dp)
-                )
-            }
-        }
-    }
-}
 
 // returns whether the string was successfully deserialized and stored in prefs
 private fun loadColorString(colorString: String, prefs: SharedPreferences): Boolean {
