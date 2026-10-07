@@ -3,7 +3,6 @@ package app.reventor.dictation
 import android.content.Context
 import android.graphics.Canvas
 import android.graphics.Paint
-import android.graphics.Path
 import android.os.SystemClock
 import android.view.View
 
@@ -64,17 +63,15 @@ class RecordingOverlay(
             .coerceIn(0L, SAMPLE_INTERVAL_MS)
         val shift = (sinceSample / SAMPLE_INTERVAL_MS.toFloat()) * step
 
-        // draw from the newest sample (right edge) leftwards; stop at the screen edge
-        val path = Path()
-        var started = false
+        // symmetric waveform: each sample is a rounded bar going up AND down
+        // from the center line, like a voice message
         for (i in 0 until samples.size) {
             val idx = (head - i + samples.size * 2) % samples.size
             val x = w - i * step - shift
             if (x < 0) break
-            val y = center - samples[idx] * halfAmp
-            if (started) path.lineTo(x, y) else { path.moveTo(x, y); started = true }
+            val amp = samples[idx] * halfAmp
+            canvas.drawLine(x, center - amp, x, center + amp, linePaint)
         }
-        canvas.drawPath(path, linePaint)
         postInvalidateOnAnimation()
     }
 

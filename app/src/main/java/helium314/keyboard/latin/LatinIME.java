@@ -1438,7 +1438,7 @@ public class LatinIME extends InputMethodService implements
         }
         getDictation().setColors(
                 colors.get(ColorType.MAIN_BACKGROUND),
-                colors.get(ColorType.ACTION_KEY_BACKGROUND),
+                colors.get(ColorType.KEY_TEXT), // the waveform uses the letter color
                 letterAreaHeight);
     }
 
