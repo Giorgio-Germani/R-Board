@@ -9,10 +9,16 @@ object SyncPrefs {
 
     private fun prefs(context: Context) = context.getSharedPreferences(FILE, Context.MODE_PRIVATE)
 
-    fun enabled(context: Context): Boolean = prefs(context).getBoolean("enabled", false)
+    /** sync auto-starts with the keyboard by default; STOP SYNC is the opt-out */
+    fun enabled(context: Context): Boolean = prefs(context).getBoolean("enabled", true)
 
     fun setEnabled(context: Context, value: Boolean) =
         prefs(context).edit().putBoolean("enabled", value).apply()
+
+    fun onboardingDone(context: Context): Boolean = prefs(context).getBoolean("onboarding_done", false)
+
+    fun setOnboardingDone(context: Context, value: Boolean) =
+        prefs(context).edit().putBoolean("onboarding_done", value).apply()
 
     fun pushToDesktop(context: Context): Boolean = prefs(context).getBoolean("push_to_desktop", true)
 

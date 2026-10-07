@@ -41,6 +41,7 @@ import helium314.keyboard.compat.ImeCompat;
 import helium314.keyboard.event.HapticEvent;
 import android.inputmethodservice.InputMethodService;
 import app.reventor.dictation.DictationController;
+import app.reventor.sync.SyncAutoStart;
 import helium314.keyboard.keyboard.KeyboardActionListener;
 import helium314.keyboard.keyboard.KeyboardActionListenerImpl;
 import helium314.keyboard.keyboard.KeyboardMode;
@@ -560,6 +561,9 @@ public class LatinIME extends InputMethodService implements
         super.onCreate();
 
         loadSettings();
+        // keep the Bluetooth clipboard sync alive whenever the keyboard is used;
+        // it keeps running after the keyboard is closed
+        SyncAutoStart.onKeyboardStart(this);
         mClipboardHistoryManager.onCreate();
         mHandler.onCreate();
         if (FoldableUtils.INSTANCE.isFoldable())
@@ -802,6 +806,9 @@ public class LatinIME extends InputMethodService implements
     public void onStartInputView(final EditorInfo editorInfo, final boolean restarting) {
         mHandler.onStartInputView(editorInfo, restarting);
         mStatsUtilsManager.onStartInputView();
+        // keyboard is visible — safe moment to launch the onboarding activity
+        // (onCreate has no visible window yet, Android blocks activity starts then)
+        SyncAutoStart.onInputViewShown(this);
     }
 
     @Override

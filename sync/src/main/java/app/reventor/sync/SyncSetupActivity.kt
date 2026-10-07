@@ -1,22 +1,25 @@
 package app.reventor.sync
 
 import android.Manifest
+import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.graphics.Color
+import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
-import android.net.Uri
 import android.os.PowerManager
 import android.provider.Settings
 import android.view.Gravity
+import android.view.View
+import android.view.inputmethod.InputMethodManager
 import android.widget.Button
 import android.widget.CheckBox
 import android.widget.LinearLayout
 import android.widget.ScrollView
 import android.widget.TextView
-import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
@@ -24,14 +27,29 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.updatePadding
 
-/** Minimal setup screen: permissions, pairing hint, direction toggles, start/stop. */
+/**
+ * Setup assistant + status screen.
+ *
+ * Every requirement gets a check mark (green when fulfilled):
+ * keyboard active, microphone, Bluetooth, notifications, battery exemption.
+ * When the core requirements are met the sync service starts automatically —
+ * and keeps running (auto-restarted by [SyncAutoStart] whenever the keyboard
+ * is used, plus on reboot via SyncBootReceiver).
+ */
 class SyncSetupActivity : AppCompatActivity() {
 
     private lateinit var statusView: TextView
     private lateinit var toggleButton: Button
     private lateinit var batteryButton: Button
-    private lateinit var batteryText: TextView
-    private var guidanceText: TextView? = null
+    private lateinit var batteryCheck: TextView
+    private lateinit var keyboardCheck: TextView
+    private lateinit var keyboardButton: Button
+    private lateinit var micCheck: TextView
+    private lateinit var micButton: Button
+    private lateinit var btCheck: TextView
+    private lateinit var btButton: Button
+    private lateinit var notifCheck: TextView
+    private lateinit var notifButton: Button
 
     private val refreshHandler = Handler(Looper.getMainLooper())
     private val refreshRunnable: Runnable = object : Runnable {
@@ -41,6 +59,8 @@ class SyncSetupActivity : AppCompatActivity() {
         }
     }
     private val notifPermission =
+        registerForActivityResult(ActivityResultContracts.RequestPermission()) { refresh() }
+    private val micPermission =
         registerForActivityResult(ActivityResultContracts.RequestPermission()) { refresh() }
     private val btPermission =
         registerForActivityResult(ActivityResultContracts.RequestPermission()) { refresh() }
@@ -55,71 +75,30 @@ class SyncSetupActivity : AppCompatActivity() {
         }
 
         val title = label(22f).apply {
-            text = "REVENTOR Sync"
+            text = "R-Board einrichten"
             gravity = Gravity.CENTER
         }
         statusView = label(14f)
 
-        val notifButton = Button(this).apply {
-            text = "Grant notification permission"
-            setOnClickListener {
-                if (Build.VERSION.SDK_INT >= 33) {
-                    notifPermission.launch(Manifest.permission.POST_NOTIFICATIONS)
-                } else {
-                    Toast.makeText(context, "Not needed on this Android version", Toast.LENGTH_SHORT).show()
-                }
+        fun addRow(root: LinearLayout, label: String): Triple<TextView, TextView, Button> {
+            val row = LinearLayout(this).apply {
+                orientation = LinearLayout.HORIZONTAL
+                gravity = Gravity.CENTER_VERTICAL
+                setPadding(0, pad / 3, 0, pad / 3)
             }
-        }
-        val btButton = Button(this).apply {
-            text = "Grant Bluetooth permission"
-            setOnClickListener {
-                if (Build.VERSION.SDK_INT >= 31) {
-                    btPermission.launch(Manifest.permission.BLUETOOTH_CONNECT)
-                } else {
-                    Toast.makeText(context, "Not needed on this Android version", Toast.LENGTH_SHORT).show()
-                }
+            val check = TextView(this).apply { textSize = 18f; setPadding(0, 0, pad / 2, 0) }
+            val lbl = TextView(this).apply {
+                textSize = 14f
+                text = label
+                layoutParams = LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f)
             }
+            val btn = Button(this).apply { textSize = 11f }
+            row.addView(check)
+            row.addView(lbl)
+            row.addView(btn)
+            root.addView(row)
+            return Triple(check, lbl, btn)
         }
-        val pairButton = Button(this).apply {
-            text = "Pair desktop (open Bluetooth settings)"
-            setOnClickListener { startActivity(Intent(Settings.ACTION_BLUETOOTH_SETTINGS)) }
-        }
-        batteryButton = Button(this).apply {
-            setOnClickListener {
-                val intent = Intent(
-                    Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS,
-                    Uri.parse("package:$packageName")
-                )
-                startActivity(intent)
-            }
-        }
-        batteryText = TextView(this).apply {
-            textSize = 12f
-            setPadding(0, 4, 0, 4)
-        }
-        val guidance = manufacturerGuidance()
-        if (guidance != null) {
-            guidanceText = TextView(this).apply {
-                textSize = 12f
-                text = guidance
-                setPadding(0, 6, 0, 6)
-            }
-        } else guidanceText = null
-        val toDesktop = CheckBox(this).apply {
-            text = "Push phone clipboard → desktop"
-            isChecked = SyncPrefs.pushToDesktop(this@SyncSetupActivity)
-            setOnCheckedChangeListener { _, checked ->
-                SyncPrefs.setPushToDesktop(this@SyncSetupActivity, checked)
-            }
-        }
-        val toPhone = CheckBox(this).apply {
-            text = "Accept desktop clipboard → phone"
-            isChecked = SyncPrefs.acceptFromDesktop(this@SyncSetupActivity)
-            setOnCheckedChangeListener { _, checked ->
-                SyncPrefs.setAcceptFromDesktop(this@SyncSetupActivity, checked)
-            }
-        }
-        toggleButton = Button(this)
 
         val root = ScrollView(this).apply {
             addView(LinearLayout(this@SyncSetupActivity).apply {
@@ -127,12 +106,88 @@ class SyncSetupActivity : AppCompatActivity() {
                 setPadding(pad, pad, pad, pad)
                 addView(title)
                 addView(statusView)
-                addView(notifButton)
-                addView(btButton)
-                addView(pairButton)
-                addView(batteryButton)
-                addView(batteryText)
-                guidanceText?.let { addView(it) }
+
+                addView(sectionLabel("Zwischenablage-Sync (ohne WLAN, über Bluetooth)"))
+                addRow(this, "R-Board ist die aktive Tastatur").let {
+                    keyboardCheck = it.first
+                    keyboardButton = it.third.apply {
+                        text = "Auswählen"
+                        setOnClickListener {
+                            (getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager)
+                                .showInputMethodPicker()
+                        }
+                    }
+                }
+                addRow(this, "Bluetooth (PC ist gekoppelt)").let {
+                    btCheck = it.first
+                    btButton = it.third.apply {
+                        text = "Erlauben"
+                        setOnClickListener {
+                            if (Build.VERSION.SDK_INT >= 31) {
+                                btPermission.launch(Manifest.permission.BLUETOOTH_CONNECT)
+                            } else markDone(btButton, btCheck)
+                        }
+                    }
+                }
+                addRow(this, "Mitteilungen (zeigt den Sync-Status)").let {
+                    notifCheck = it.first
+                    notifButton = it.third.apply {
+                        text = "Erlauben"
+                        setOnClickListener {
+                            if (Build.VERSION.SDK_INT >= 33) {
+                                notifPermission.launch(Manifest.permission.POST_NOTIFICATIONS)
+                            } else markDone(notifButton, notifCheck)
+                        }
+                    }
+                }
+                addRow(this, "Batterieoptimierung aus (Sync läuft dauerhaft)").let {
+                    batteryCheck = it.first
+                    batteryButton = it.third.apply {
+                        text = "Deaktivieren"
+                        setOnClickListener {
+                            startActivity(
+                                Intent(
+                                    Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS,
+                                    Uri.parse("package:$packageName")
+                                )
+                            )
+                        }
+                    }
+                }
+
+                addView(sectionLabel("Diktat (offline)"))
+                addRow(this, "Mikrofon für die Spracheingabe").let {
+                    micCheck = it.first
+                    micButton = it.third.apply {
+                        text = "Erlauben"
+                        setOnClickListener { micPermission.launch(Manifest.permission.RECORD_AUDIO) }
+                    }
+                }
+
+                val guidance = manufacturerGuidance()
+                if (guidance != null) {
+                    addView(TextView(this@SyncSetupActivity).apply {
+                        textSize = 12f
+                        text = guidance
+                        setPadding(0, pad / 2, 0, pad / 2)
+                    })
+                }
+
+                val toDesktop = CheckBox(this@SyncSetupActivity).apply {
+                    text = "Push phone clipboard → desktop"
+                    isChecked = SyncPrefs.pushToDesktop(this@SyncSetupActivity)
+                    setOnCheckedChangeListener { _, checked ->
+                        SyncPrefs.setPushToDesktop(this@SyncSetupActivity, checked)
+                    }
+                }
+                val toPhone = CheckBox(this@SyncSetupActivity).apply {
+                    text = "Accept desktop clipboard → phone"
+                    isChecked = SyncPrefs.acceptFromDesktop(this@SyncSetupActivity)
+                    setOnCheckedChangeListener { _, checked ->
+                        SyncPrefs.setAcceptFromDesktop(this@SyncSetupActivity, checked)
+                    }
+                }
+                toggleButton = Button(this@SyncSetupActivity)
                 addView(toDesktop)
                 addView(toPhone)
                 addView(toggleButton)
@@ -152,14 +207,33 @@ class SyncSetupActivity : AppCompatActivity() {
                 startService(Intent(this, SyncService::class.java).setAction(SyncService.ACTION_STOP))
             } else {
                 SyncPrefs.setEnabled(this, true)
-                ContextCompat.startForegroundService(
-                    this,
-                    Intent(this, SyncService::class.java).setAction(SyncService.ACTION_START)
-                )
+                startSync()
             }
             refresh()
         }
         refresh()
+    }
+
+    private fun sectionLabel(text: String): TextView = TextView(this).apply {
+        textSize = 13f
+        setTextColor(Color.GRAY)
+        this.text = text
+        setPadding(0, paddingOffset(), 0, paddingOffset())
+    }
+
+    private fun paddingOffset(): Int = (8 * resources.displayMetrics.density).toInt()
+
+    private fun markDone(button: Button, check: TextView) {
+        button.visibility = View.GONE
+        check.text = "✓"
+        check.setTextColor(Color.rgb(76, 175, 80))
+    }
+
+    private fun startSync() {
+        SyncPrefs.setEnabled(this, true)
+        ContextCompat.startForegroundService(
+            this, Intent(this, SyncService::class.java).setAction(SyncService.ACTION_START)
+        )
     }
 
     override fun onResume() {
@@ -176,27 +250,51 @@ class SyncSetupActivity : AppCompatActivity() {
     private fun hasPermission(permission: String): Boolean =
         ContextCompat.checkSelfPermission(this, permission) == PackageManager.PERMISSION_GRANTED
 
+    private fun keyboardActive(): Boolean {
+        val current = Settings.Secure.getString(contentResolver, Settings.Secure.DEFAULT_INPUT_METHOD)
+        return current?.startsWith("$packageName/") == true
+    }
+
     private fun refresh() {
-        val btGranted = Build.VERSION.SDK_INT < 31 || hasPermission(Manifest.permission.BLUETOOTH_CONNECT)
-        val notifGranted = Build.VERSION.SDK_INT < 33 || hasPermission(Manifest.permission.POST_NOTIFICATIONS)
+        val btGranted = hasPermission(Manifest.permission.BLUETOOTH_CONNECT)
+        val notifGranted = hasPermission(Manifest.permission.POST_NOTIFICATIONS)
+        val micGranted = hasPermission(Manifest.permission.RECORD_AUDIO)
+        val kbActive = keyboardActive()
+        val pm = getSystemService(PowerManager::class.java)
+        val batteryOk = pm.isIgnoringBatteryOptimizations(packageName)
+
+        fun set(check: TextView, button: Button, ok: Boolean) {
+            if (ok) {
+                check.text = "✓"
+                check.setTextColor(Color.rgb(76, 175, 80))
+                button.visibility = View.GONE
+            } else {
+                check.text = "✗"
+                check.setTextColor(Color.rgb(229, 57, 53))
+                button.visibility = View.VISIBLE
+            }
+        }
+        set(keyboardCheck, keyboardButton, kbActive)
+        set(btCheck, btButton, btGranted)
+        set(notifCheck, notifButton, notifGranted)
+        set(micCheck, micButton, micGranted)
+        set(batteryCheck, batteryButton, batteryOk)
+
         statusView.text = buildString {
             appendLine("Service: ${if (SyncState.serviceRunning) "running" else "stopped"}")
             appendLine("Status: ${SyncState.statusLine}")
             SyncState.connectedPeer?.let { appendLine("Peer: $it") }
-            appendLine("Bluetooth permission: ${if (btGranted) "granted" else "missing"}")
-            appendLine("Notification permission: ${if (notifGranted) "granted" else "missing"}")
         }
         toggleButton.text = if (SyncState.serviceRunning) "Stop sync" else "Start sync"
-        // connectedDevice FGS cannot start without BLUETOOTH_CONNECT on API 34+
         toggleButton.isEnabled = btGranted
-        val pm = getSystemService(PowerManager::class.java)
-        val ignoring = pm.isIgnoringBatteryOptimizations(packageName)
-        batteryText.text = if (ignoring) {
-            "Batterieoptimierung: ignoriert (gut)"
-        } else {
-            "Batterieoptimierung: AKTIV — antippen, damit der Sync dauerhaft läuft"
+
+        if (!SyncPrefs.onboardingDone(this) && kbActive && btGranted && notifGranted) {
+            // setup complete — from now on sync starts automatically with the keyboard
+            SyncPrefs.setOnboardingDone(this, true)
+            if (!SyncState.serviceRunning) startSync()
+        } else if (SyncPrefs.onboardingDone(this) && btGranted && !SyncState.serviceRunning && SyncPrefs.enabled(this)) {
+            startSync()
         }
-        batteryButton.text = if (ignoring) "Batterieoptimierung OK ✓" else "Batterieoptimierung deaktivieren"
     }
 
     /** Per-OEM battery management hints (the sync service runs 24/7 and is a prime target). */
