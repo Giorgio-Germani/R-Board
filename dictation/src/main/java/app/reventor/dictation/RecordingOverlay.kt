@@ -64,11 +64,12 @@ class RecordingOverlay(
             .coerceIn(0L, SAMPLE_INTERVAL_MS)
         val shift = (sinceSample / SAMPLE_INTERVAL_MS.toFloat()) * step
 
+        // draw from the newest sample (right edge) leftwards; stop at the screen edge
         val path = Path()
         var started = false
-        for (i in samples.size downTo 1) {
-            val idx = (head - (i - 1) + samples.size * 2) % samples.size
-            val x = w - (i - 1) * step - shift
+        for (i in 0 until samples.size) {
+            val idx = (head - i + samples.size * 2) % samples.size
+            val x = w - i * step - shift
             if (x < 0) break
             val y = center - samples[idx] * halfAmp
             if (started) path.lineTo(x, y) else { path.moveTo(x, y); started = true }
