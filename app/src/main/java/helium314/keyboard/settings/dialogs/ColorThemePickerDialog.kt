@@ -202,53 +202,167 @@ private fun AddColorRow(onDismissRequest: () -> Unit, userColors: Collection<Str
 private fun ColorItemRow(onDismissRequest: () -> Unit, item: String, isSelected: Boolean, isUser: Boolean, targetScreen: String, prefKey: String) {
     val ctx = LocalContext.current
     val prefs = ctx.prefs()
-    Row(
-        horizontalArrangement = Arrangement.spacedBy(8.dp),
-        verticalAlignment = Alignment.CenterVertically,
+    // preview what the keyboard will look like with this color theme
+    val previewColors = remember(item) {
+        runCatching {
+            KeyboardTheme.getThemeColors(
+                item,
+                prefs.getString(Settings.PREF_THEME_STYLE, Defaults.PREF_THEME_STYLE)!!,
+                ctx, prefs, targetScreen == SettingsDestination.ColorsNight
+            )
+        }.getOrNull()
+    }
+    Column(
         modifier = Modifier
+            .fillMaxWidth()
             .clickable {
                 onDismissRequest()
                 prefs.edit {putString(prefKey, item)}
                 KeyboardSwitcher.getInstance().setThemeNeedsReload()
             }
             .padding(start = 6.dp)
-            .heightIn(min = 40.dp)
     ) {
-        RadioButton(
-            selected = isSelected,
-            onClick = {
-                onDismissRequest()
-                prefs.edit { putString(prefKey, item) }
-                KeyboardSwitcher.getInstance().setThemeNeedsReload()
-            }
-        )
-        Text(
-            text = item.getStringResourceOrName("theme_name_", ctx),
-            style = MaterialTheme.typography.bodyLarge,
-            modifier = Modifier.weight(1f),
-        )
-        if (isUser) {
-            var showDialog by remember { mutableStateOf(false) }
-            DeleteButton { showDialog = true }
-            EditButton {
-                onDismissRequest()
-                SettingsDestination.navigateTo(targetScreen + item)
-            }
-            if (showDialog)
-                ConfirmationDialog(
-                    onDismissRequest = { showDialog = false },
-                    content = { Text(stringResource(R.string.delete_confirmation, item)) },
-                    onConfirmed = {
-                        showDialog = false
-                        prefs.edit {
-                            remove(Settings.PREF_USER_COLORS_PREFIX + item)
-                            remove(Settings.PREF_USER_ALL_COLORS_PREFIX + item)
-                            remove(Settings.PREF_USER_MORE_COLORS_PREFIX + item)
-                            if (isSelected) remove(prefKey)
+        Row(
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier
+                .heightIn(min = 40.dp)
+                .fillMaxWidth()
+        ) {
+            RadioButton(
+                selected = isSelected,
+                onClick = {
+                    onDismissRequest()
+                    prefs.edit { putString(prefKey, item) }
+                    KeyboardSwitcher.getInstance().setThemeNeedsReload()
+                }
+            )
+            Text(
+                text = item.getStringResourceOrName("theme_name_", ctx),
+                style = MaterialTheme.typography.bodyLarge,
+                modifier = Modifier.weight(1f),
+            )
+            if (isUser) {
+                var showDialog by remember { mutableStateOf(false) }
+                DeleteButton { showDialog = true }
+                EditButton {
+                    onDismissRequest()
+                    SettingsDestination.navigateTo(targetScreen + item)
+                }
+                if (showDialog)
+                    ConfirmationDialog(
+                        onDismissRequest = { showDialog = false },
+                        content = { Text(stringResource(R.string.delete_confirmation, item)) },
+                        onConfirmed = {
+                            showDialog = false
+                            prefs.edit {
+                                remove(Settings.PREF_USER_COLORS_PREFIX + item)
+                                remove(Settings.PREF_USER_ALL_COLORS_PREFIX + item)
+                                remove(Settings.PREF_USER_MORE_COLORS_PREFIX + item)
+                                if (isSelected) remove(prefKey)
+                            }
+                            KeyboardSwitcher.getInstance().setThemeNeedsReload()
                         }
-                        KeyboardSwitcher.getInstance().setThemeNeedsReload()
+                    )
+            }
+        }
+        if (previewColors != null) {
+            KeyboardThemePreview(previewColors)
+        }
+    }
+}
+
+/** small stylized keyboard rendering using the colors of the theme, so the user can see the result before choosing */
+@Composable
+private fun KeyboardThemePreview(colors: Colors) {
+    val keyShape = RoundedCornerShape(5.dp)
+    Column(
+        Modifier
+            .fillMaxWidth()
+            .padding(start = 48.dp, end = 12.dp, bottom = 10.dp)
+            .clip(RoundedCornerShape(10.dp))
+            .background(Color(colors.get(ColorType.MAIN_BACKGROUND)))
+            .padding(6.dp),
+        verticalArrangement = Arrangement.spacedBy(3.dp)
+    ) {
+        // toolbar with a few icons and the expand key
+        Row(
+            Modifier.fillMaxWidth().padding(vertical = 2.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            repeat(4) {
+                Box(Modifier.weight(1f), contentAlignment = Alignment.CenterStart) {
+                    Box(Modifier.size(7.dp).clip(CircleShape).background(Color(colors.get(ColorType.TOOL_BAR_KEY))))
+                }
+            }
+            Box(
+                Modifier
+                    .size(width = 12.dp, height = 10.dp)
+                    .clip(keyShape)
+                    .background(Color(colors.get(ColorType.TOOL_BAR_EXPAND_KEY_BACKGROUND))),
+                contentAlignment = Alignment.Center
+            ) {
+                Box(Modifier.size(4.dp).clip(CircleShape).background(Color(colors.get(ColorType.TOOL_BAR_EXPAND_KEY))))
+            }
+        }
+        listOf("qwertzuiop", "asdfghjklä", "⇧yxcvbnm⌫").forEach { row ->
+            Row(horizontalArrangement = Arrangement.spacedBy(3.dp)) {
+                row.forEach { ch ->
+                    val functional = ch == '⇧' || ch == '⌫'
+                    Box(
+                        Modifier
+                            .weight(1f)
+                            .clip(keyShape)
+                            .background(Color(colors.get(if (functional) ColorType.FUNCTIONAL_KEY_BACKGROUND else ColorType.KEY_BACKGROUND))),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text(
+                            ch.toString(),
+                            color = Color(colors.get(if (functional) ColorType.FUNCTIONAL_KEY_TEXT else ColorType.KEY_TEXT)),
+                            fontSize = 10.sp,
+                            modifier = Modifier.padding(vertical = 5.dp)
+                        )
                     }
+                }
+            }
+        }
+        Row(horizontalArrangement = Arrangement.spacedBy(3.dp)) {
+            Box(
+                Modifier.weight(1.6f).clip(keyShape)
+                    .background(Color(colors.get(ColorType.FUNCTIONAL_KEY_BACKGROUND))),
+                contentAlignment = Alignment.Center
+            ) {
+                Text(
+                    "?123",
+                    color = Color(colors.get(ColorType.FUNCTIONAL_KEY_TEXT)),
+                    fontSize = 9.sp,
+                    modifier = Modifier.padding(vertical = 5.dp)
                 )
+            }
+            Box(
+                Modifier.weight(4f).clip(keyShape)
+                    .background(Color(colors.get(ColorType.SPACE_BAR_BACKGROUND))),
+                contentAlignment = Alignment.Center
+            ) {
+                Text(
+                    "Deutsch",
+                    color = Color(colors.get(ColorType.SPACE_BAR_TEXT)),
+                    fontSize = 9.sp,
+                    modifier = Modifier.padding(vertical = 5.dp)
+                )
+            }
+            Box(
+                Modifier.weight(1.4f).clip(keyShape)
+                    .background(Color(colors.get(ColorType.ACTION_KEY_BACKGROUND))),
+                contentAlignment = Alignment.Center
+            ) {
+                Text(
+                    "⏎",
+                    color = Color(colors.get(ColorType.ACTION_KEY_ICON)),
+                    fontSize = 10.sp,
+                    modifier = Modifier.padding(vertical = 5.dp)
+                )
+            }
         }
     }
 }

@@ -144,37 +144,52 @@ private constructor(val themeId: Int, @JvmField val mStyleId: Int) {
             return applyTwoColorMode(getThemeColors(themeName!!, themeStyle!!, context, prefs, isNight), prefs)
         }
 
-        const val PREF_TWO_COLOR_BACKGROUND = "two_color_background"
-        const val PREF_TWO_COLOR_TEXT = "two_color_text"
+    const val PREF_TWO_COLOR_BACKGROUND = "two_color_background"
+    const val PREF_TWO_COLOR_TEXT = "two_color_text"
 
-        /* product decision: the user picks exactly two colors — keyboard background and
-         * key text. Key surfaces derive as progressively lighter blends of the
-         * background so the keyboard stays readable with any color pair. */
-        private fun applyTwoColorMode(colors: Colors, prefs: SharedPreferences): Colors {
-            val bg = prefs.getString(PREF_TWO_COLOR_BACKGROUND, null)?.toIntOrNull() ?: return colors
-            val text = prefs.getString(PREF_TWO_COLOR_TEXT, null)?.toIntOrNull() ?: return colors
-            fun blend(c: Int, other: Int, f: Float) = androidx.core.graphics.ColorUtils.blendARGB(c, other, f)
-            val white = 0xFFFFFFFF.toInt()
-            val map = EnumMap<ColorType, Int>(ColorType::class.java)
-            map[ColorType.MAIN_BACKGROUND] = bg
-            map[ColorType.STRIP_BACKGROUND] = bg
-            map[ColorType.KEY_BACKGROUND] = blend(bg, white, 0.16f)
-            map[ColorType.FUNCTIONAL_KEY_BACKGROUND] = blend(bg, white, 0.08f)
-            map[ColorType.SPACE_BAR_BACKGROUND] = blend(bg, white, 0.05f)
-            map[ColorType.KEY_PREVIEW_BACKGROUND] = blend(bg, white, 0.3f)
-            map[ColorType.POPUP_KEYS_BACKGROUND] = blend(bg, white, 0.22f)
-            map[ColorType.KEY_TEXT] = text
-            map[ColorType.KEY_HINT_TEXT] = blend(text, bg, 0.35f)
-            map[ColorType.FUNCTIONAL_KEY_TEXT] = blend(text, bg, 0.15f)
-            map[ColorType.SPACE_BAR_TEXT] = text
-            map[ColorType.SUGGESTED_WORD] = text
-            map[ColorType.SUGGESTION_TYPED_WORD] = text
-            map[ColorType.SUGGESTION_AUTO_CORRECT] = text
-            map[ColorType.GESTURE_TRAIL] = blend(text, bg, 0.45f)
-            return AllColors(map, colors.themeStyle, colors.hasKeyBorders, null)
+    /* product decision: the user picks exactly two colors — keyboard background and
+     * key text. All remaining colors derive from this pair: key surfaces as progressive
+     * blends of the background, UI elements in the text color. Every ColorType must be
+     * mapped, because AllColors falls back to a pseudo-random color for missing entries. */
+    private fun applyTwoColorMode(colors: Colors, prefs: SharedPreferences): Colors {
+        val bg = prefs.getString(PREF_TWO_COLOR_BACKGROUND, null)?.toIntOrNull() ?: return colors
+        val text = prefs.getString(PREF_TWO_COLOR_TEXT, null)?.toIntOrNull() ?: return colors
+        val map = EnumMap<ColorType, Int>(ColorType::class.java)
+        // key surfaces move away from the background: lighter on a dark background, darker on a bright one
+        val surface = if (androidx.core.graphics.ColorUtils.calculateLuminance(bg) < 0.5) 0xFFFFFFFF.toInt() else 0xFF000000.toInt()
+        fun bgBlend(f: Float) = androidx.core.graphics.ColorUtils.blendARGB(bg, surface, f)
+        fun textBlend(f: Float) = androidx.core.graphics.ColorUtils.blendARGB(text, bg, f)
+        val keyBackground = bgBlend(0.16f)
+        val functionalKeyBackground = bgBlend(0.08f)
+        for (colorType in ColorType.entries) {
+            map[colorType] = when (colorType) {
+                ColorType.MAIN_BACKGROUND, ColorType.STRIP_BACKGROUND, ColorType.NAVIGATION_BAR,
+                    ColorType.MORE_SUGGESTIONS_WORD_BACKGROUND, ColorType.ONE_HANDED_MODE_BUTTON -> bg
+                ColorType.KEY_BACKGROUND, ColorType.CLIPBOARD_SUGGESTION_BACKGROUND,
+                    ColorType.TOOL_BAR_EXPAND_KEY_BACKGROUND -> keyBackground
+                ColorType.FUNCTIONAL_KEY_BACKGROUND, ColorType.ACTION_KEY_BACKGROUND,
+                    ColorType.EMOJI_SEARCH_BACKGROUND, ColorType.AUTOFILL_BACKGROUND_CHIP -> functionalKeyBackground
+                ColorType.SPACE_BAR_BACKGROUND -> bgBlend(0.05f)
+                ColorType.KEY_PREVIEW_BACKGROUND, ColorType.GESTURE_PREVIEW -> bgBlend(0.3f)
+                ColorType.POPUP_KEYS_BACKGROUND, ColorType.ACTION_KEY_POPUP_KEYS_BACKGROUND -> bgBlend(0.22f)
+                ColorType.MORE_SUGGESTIONS_BACKGROUND -> bgBlend(0.1f)
+                ColorType.TOOL_BAR_KEY_ENABLED_BACKGROUND -> androidx.core.graphics.ColorUtils.blendARGB(bg, text, 0.4f)
+                ColorType.FUNCTIONAL_KEY_TEXT -> textBlend(0.15f)
+                ColorType.KEY_HINT_TEXT, ColorType.MORE_SUGGESTIONS_HINT -> textBlend(0.35f)
+                ColorType.GESTURE_TRAIL -> textBlend(0.45f)
+                ColorType.ACTION_KEY_ICON, ColorType.CLIPBOARD_PIN, ColorType.EMOJI_CATEGORY,
+                    ColorType.EMOJI_CATEGORY_SELECTED, ColorType.EMOJI_KEY_TEXT, ColorType.EMOJI_SEARCH_TEXT,
+                    ColorType.KEY_ICON, ColorType.KEY_TEXT, ColorType.KEY_PREVIEW_TEXT, ColorType.POPUP_KEY_TEXT,
+                    ColorType.POPUP_KEY_ICON, ColorType.SHIFT_KEY_ICON, ColorType.SPACE_BAR_TEXT,
+                    ColorType.REMOVE_SUGGESTION_ICON, ColorType.CLIPBOARD_SUGGESTION_ICON, ColorType.SUGGESTED_WORD,
+                    ColorType.SUGGESTION_AUTO_CORRECT, ColorType.SUGGESTION_TYPED_WORD, ColorType.SUGGESTION_VALID_WORD,
+                    ColorType.TOOL_BAR_KEY, ColorType.TOOL_BAR_EXPAND_KEY -> text
+            }
         }
+        return AllColors(map, colors.themeStyle, colors.hasKeyBorders, null)
+    }
 
-        private fun getThemeColors(themeName: String, themeStyle: String, context: Context, prefs: SharedPreferences, isNight: Boolean): Colors {
+        fun getThemeColors(themeName: String, themeStyle: String, context: Context, prefs: SharedPreferences, isNight: Boolean): Colors {
             val hasBorders = prefs.getBoolean(Settings.PREF_THEME_KEY_BORDERS, Defaults.PREF_THEME_KEY_BORDERS)
             val backgroundImage = Settings.readUserBackgroundImage(context, isNight)
             return when (themeName) {

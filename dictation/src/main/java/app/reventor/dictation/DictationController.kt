@@ -6,6 +6,7 @@ import android.media.AudioFormat
 import android.media.AudioRecord
 import android.media.MediaRecorder
 import android.util.Log
+import android.view.View
 import android.widget.Toast
 import androidx.core.content.ContextCompat
 import java.util.concurrent.Executors
@@ -44,6 +45,11 @@ class DictationController(private val ime: InputMethodService) {
     private val chunks = ArrayList<FloatArray>()
     private var totalSamples = 0
 
+    // recording overlay (replaces the keys with a volume-reactive circle)
+    private var overlay: RecordingOverlay? = null
+    @Volatile private var themeBackground = 0xFF16191E.toInt()
+    @Volatile private var themeCircle = 0xFF3D5AFE.toInt()
+
     // gesture bookkeeping between press / release / tap events
     @Volatile
     private var gestureHandled = false // press started a dictation gesture (PTT)
@@ -58,6 +64,39 @@ class DictationController(private val ime: InputMethodService) {
 
     @Volatile
     private var sessionActive = false
+
+    /** Theme colors for the recording overlay (keyboard background / enter-key color). */
+    fun setColors(background: Int, circle: Int) {
+        themeBackground = background
+        themeCircle = circle
+    }
+
+    private fun showOverlay() = main.post {
+        if (overlay != null) return@post
+        val content = ime.window?.findViewById(android.R.id.content) as? android.view.ViewGroup
+            ?: return@post
+        val ov = RecordingOverlay(ime, themeBackground, themeCircle)
+        // cover exactly the key rows (QWERTY .. spacebar row), not the whole display
+        val kbId = ime.resources.getIdentifier("keyboard_view", "id", ime.packageName)
+        val kbView = if (kbId != 0) content.findViewById<View>(kbId) else null
+        val kbParent = kbView?.parent as? android.view.ViewGroup
+        if (kbView != null && kbParent != null) {
+            kbParent.addView(ov, kbParent.indexOfChild(kbView) + 1, kbView.layoutParams)
+        } else {
+            content.addView(
+                ov,
+                android.view.ViewGroup.LayoutParams.MATCH_PARENT,
+                android.view.ViewGroup.LayoutParams.MATCH_PARENT
+            )
+        }
+        overlay = ov
+    }
+
+    private fun hideOverlay() = main.post {
+        overlay?.stopAnimating()
+        (overlay?.parent as? android.view.ViewGroup)?.removeView(overlay)
+        overlay = null
+    }
 
     /** Key-down on the layout voice key: start push-to-talk. */
     fun onPressStart() {
@@ -173,6 +212,13 @@ class DictationController(private val ime: InputMethodService) {
                         chunks.add(tmp.copyOf(n))
                         totalSamples += n
                     }
+                    var sum = 0.0
+                    for (i in 0 until n) {
+                        val v = tmp[i].toDouble()
+                        sum += v * v
+                    }
+                    val rms = kotlin.math.sqrt(sum / n)
+                    overlay?.setAmplitude(rms.toFloat()) // thread-safe (postInvalidateOnAnimation)
                 }
             }
             // hit the 30 s cap with nobody pressing stop (user walked away) — auto-finalize
@@ -180,11 +226,13 @@ class DictationController(private val ime: InputMethodService) {
                 finalizeOnExecutor()
             }
         }.also { it.start() }
+        showOverlay()
         if (pendingRelease) finalizeOnExecutor()
     }
 
     private fun finalizeOnExecutor() {
         sessionActive = false
+        hideOverlay()
         executor.execute {
             val pcm = stopRecorder() ?: return@execute
             val language = currentLanguage()

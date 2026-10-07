@@ -61,6 +61,7 @@ import helium314.keyboard.keyboard.KeyboardSwitcher;
 import helium314.keyboard.keyboard.MainKeyboardView;
 import helium314.keyboard.latin.SuggestedWords.SuggestedWordInfo;
 import helium314.keyboard.latin.common.ColorType;
+import helium314.keyboard.latin.common.Colors;
 import helium314.keyboard.latin.common.Constants;
 import helium314.keyboard.latin.common.CoordinateUtils;
 import helium314.keyboard.latin.common.InputPointers;
@@ -1424,10 +1425,19 @@ public class LatinIME extends InputMethodService implements
         return mDictationController;
     }
 
+    /** hands the current theme colors to the dictation recording overlay */
+    public void passDictationColors() {
+        final Colors colors = mSettings.getCurrent().mColors;
+        getDictation().setColors(
+                colors.get(ColorType.MAIN_BACKGROUND),
+                colors.get(ColorType.ACTION_KEY_BACKGROUND));
+    }
+
     public void onEvent(@NonNull final Event event) {
         if (KeyCode.VOICE_INPUT == event.getKeyCode()) {
             // offline push-to-talk dictation (Needle/Whistle); fall back to the
             // external voice-IME shortcut when dictation is unavailable on this device
+            passDictationColors();
             if (getDictation().onVoiceKeyTap()) return;
             mRichImm.switchToShortcutIme(this);
         }
