@@ -80,7 +80,7 @@ class SyncService : Service() {
             if (Build.VERSION.SDK_INT >= 31) ContextCompat.checkSelfPermission(this, android.Manifest.permission.BLUETOOTH_CONNECT)
             else PackageManager.PERMISSION_GRANTED
         if (connectPermission != PackageManager.PERMISSION_GRANTED) {
-            SyncState.statusLine = "Bluetooth permission missing — grant it in REVENTOR Clipboard Sync setup"
+            SyncState.statusLine = "Bluetooth permission missing — grant it in R-Board Clipboard Sync setup"
             stopSelf()
             return START_NOT_STICKY
         }
@@ -118,7 +118,7 @@ class SyncService : Service() {
         )
         val notification = NotificationCompat.Builder(this, CHANNEL_ID)
             .setSmallIcon(android.R.drawable.stat_sys_data_bluetooth)
-            .setContentTitle("REVENTOR Clipboard Sync")
+            .setContentTitle("R-Board Clipboard Sync")
             .setContentText(SyncState.statusLine)
             .setOngoing(true)
             .setContentIntent(pi)
@@ -139,7 +139,7 @@ class SyncService : Service() {
                 continue
             }
             val server = try {
-                adapter.listenUsingRfcommWithServiceRecord("REVENTOR Clipboard Sync", SERVICE_UUID)
+                adapter.listenUsingRfcommWithServiceRecord("R-Board Clipboard Sync", SERVICE_UUID)
             } catch (e: SecurityException) {
                 Log.w(TAG, "listen blocked by permission", e)
                 break
