@@ -13,14 +13,17 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import helium314.keyboard.latin.R
 import helium314.keyboard.latin.common.ColorType
 import helium314.keyboard.latin.common.Colors
 
@@ -145,19 +148,25 @@ private fun PreviewKey(
     }
 }
 
-/** simple monochrome mic glyph (capsule + base), matching the real keyboard's icon */
+/** the real keyboard mic icon (same vector as the voice key), tinted with the functional text color */
 @Composable
 private fun MicKey(colors: Colors, keyShape: RoundedCornerShape, modifier: Modifier = Modifier) {
-    val iconColor = Color(colors.get(ColorType.FUNCTIONAL_KEY_TEXT))
+    val iconRes = when (colors.themeStyle) {
+        helium314.keyboard.keyboard.KeyboardTheme.STYLE_HOLO -> R.drawable.sym_keyboard_voice_holo
+        helium314.keyboard.keyboard.KeyboardTheme.STYLE_ROUNDED -> R.drawable.sym_keyboard_voice_rounded
+        else -> R.drawable.sym_keyboard_voice_lxx
+    }
     Box(
         modifier
             .clip(keyShape)
             .background(Color(colors.get(ColorType.FUNCTIONAL_KEY_BACKGROUND))),
         contentAlignment = Alignment.Center
     ) {
-        Column(horizontalAlignment = Alignment.CenterHorizontally) {
-            Box(Modifier.width(5.dp).height(9.dp).clip(RoundedCornerShape(2.5.dp)).background(iconColor))
-            Box(Modifier.padding(top = 1.dp).width(9.dp).height(2.dp).clip(RoundedCornerShape(1.dp)).background(iconColor))
-        }
+        androidx.compose.material3.Icon(
+            painterResource(iconRes),
+            contentDescription = null,
+            tint = Color(colors.get(ColorType.FUNCTIONAL_KEY_TEXT)),
+            modifier = Modifier.size(13.dp)
+        )
     }
 }
