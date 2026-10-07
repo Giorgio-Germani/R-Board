@@ -1,6 +1,8 @@
 package app.reventor.sync
 
 import android.Manifest
+import android.bluetooth.BluetoothClass
+import android.bluetooth.BluetoothManager
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
@@ -48,6 +50,9 @@ class SyncSetupActivity : AppCompatActivity() {
     private lateinit var micButton: Button
     private lateinit var btCheck: TextView
     private lateinit var btButton: Button
+    private lateinit var pcCheck: TextView
+    private lateinit var pcLabel: TextView
+    private lateinit var pcButton: Button
     private lateinit var notifCheck: TextView
     private lateinit var notifButton: Button
 
@@ -64,6 +69,8 @@ class SyncSetupActivity : AppCompatActivity() {
         registerForActivityResult(ActivityResultContracts.RequestPermission()) { refresh() }
     private val btPermission =
         registerForActivityResult(ActivityResultContracts.RequestPermission()) { refresh() }
+    private val discoverableLauncher =
+        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { refresh() }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -126,6 +133,24 @@ class SyncSetupActivity : AppCompatActivity() {
                             if (Build.VERSION.SDK_INT >= 31) {
                                 btPermission.launch(Manifest.permission.BLUETOOTH_CONNECT)
                             } else markDone(btButton, btCheck)
+                        }
+                    }
+                }
+                addRow(this, "Computer koppeln").let {
+                    pcCheck = it.first
+                    pcLabel = it.second
+                    pcButton = it.third.apply {
+                        text = "Sichtbar machen"
+                        setOnClickListener {
+                            android.widget.Toast.makeText(
+                                this@SyncSetupActivity,
+                                "Sichtbar für 5 Minuten — wähle am PC \"Gerät hinzufügen\" und dann das Telefon.",
+                                android.widget.Toast.LENGTH_LONG
+                            ).show()
+                            discoverableLauncher.launch(
+                                Intent(android.bluetooth.BluetoothAdapter.ACTION_REQUEST_DISCOVERABLE)
+                                    .putExtra(android.bluetooth.BluetoothAdapter.EXTRA_DISCOVERABLE_DURATION, 300)
+                            )
                         }
                     }
                 }
@@ -276,6 +301,28 @@ class SyncSetupActivity : AppCompatActivity() {
         }
         set(keyboardCheck, keyboardButton, kbActive)
         set(btCheck, btButton, btGranted)
+        // pairing assist: list paired computers, offer to make the phone discoverable
+        val adapter = if (btGranted) getSystemService(BluetoothManager::class.java)?.adapter else null
+        if (adapter?.state == android.bluetooth.BluetoothAdapter.STATE_ON && btGranted) {
+            @Suppress("DEPRECATION")
+            val computers = adapter.bondedDevices.orEmpty().filter {
+                it.bluetoothClass?.majorDeviceClass == BluetoothClass.Device.Major.COMPUTER
+            }
+            if (computers.isNotEmpty()) {
+                pcCheck.text = "✓"
+                pcCheck.setTextColor(Color.rgb(76, 175, 80))
+                pcLabel.text = "Computer koppeln: " + computers.joinToString(", ") { it.name ?: "PC" }
+            } else {
+                pcCheck.text = "·"
+                pcCheck.setTextColor(Color.GRAY)
+                pcLabel.text = "Computer koppeln (am PC \"Gerät hinzufügen\" wählen)"
+            }
+        } else {
+            pcCheck.text = "·"
+            pcCheck.setTextColor(Color.GRAY)
+            pcLabel.text = "Computer koppeln (Bluetooth aus oder keine Berechtigung)"
+        }
+        pcButton.visibility = View.VISIBLE
         set(notifCheck, notifButton, notifGranted)
         set(micCheck, micButton, micGranted)
         // battery: MIUI's "Keine Beschränkungen" selection is sufficient and not
