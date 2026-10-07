@@ -208,7 +208,7 @@ class DictationController(private val ime: InputMethodService) {
         recorder = rec
         rec.startRecording()
         readerThread = Thread {
-            val tmp = FloatArray(SAMPLE_RATE / 5) // 200 ms
+            val tmp = FloatArray(SAMPLE_RATE / 25) // 40 ms — amplitude granularity for the waveform
             while (recording && totalSamples < MAX_SAMPLES) {
                 val n = rec.read(tmp, 0, tmp.size, AudioRecord.READ_BLOCKING)
                 if (n > 0) {
@@ -222,7 +222,7 @@ class DictationController(private val ime: InputMethodService) {
                         sum += v * v
                     }
                     val rms = kotlin.math.sqrt(sum / n)
-                    overlay?.setAmplitude(rms.toFloat()) // thread-safe (postInvalidateOnAnimation)
+                    overlay?.pushAmplitude(rms.toFloat()) // thread-safe (postInvalidateOnAnimation)
                 }
             }
             // hit the 30 s cap with nobody pressing stop (user walked away) — auto-finalize
