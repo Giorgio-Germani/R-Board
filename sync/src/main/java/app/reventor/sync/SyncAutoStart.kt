@@ -6,6 +6,8 @@ import android.os.Build
 import android.util.Log
 import androidx.core.content.ContextCompat
 import android.inputmethodservice.InputMethodService
+import android.os.Handler
+import android.os.Looper
 
 /**
  * Keeps the Bluetooth clipboard sync alive without manual steps:
@@ -24,17 +26,21 @@ object SyncAutoStart {
         ensureService(ime)
     }
 
-    /** keyboard view is visible — safe place to launch the onboarding activity (BAL rules) */
+    /** keyboard view shown — launch the onboarding once the IME window is visible (BAL rules) */
     @JvmStatic
     fun onInputViewShown(ime: InputMethodService) {
         if (!SyncPrefs.onboardingDone(ime)) {
-            try {
-                ime.startActivity(
-                    Intent(ime, SyncSetupActivity::class.java).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-                )
-            } catch (t: Throwable) {
-                Log.w(TAG, "onboarding launch failed", t)
-            }
+            // the IME window is not yet in the "visible window" set during the first
+            // frames — a short delay lets the background-activity-launch check pass
+            Handler(Looper.getMainLooper()).postDelayed({
+                try {
+                    ime.startActivity(
+                        Intent(ime, SyncSetupActivity::class.java).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                    )
+                } catch (t: Throwable) {
+                    Log.w(TAG, "onboarding launch failed", t)
+                }
+            }, 600)
             return
         }
         ensureService(ime)
