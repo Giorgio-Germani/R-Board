@@ -1,0 +1,28 @@
+[package]
+name = "reventor-agent"
+description = "R-Board clipboard sync desktop agent (Windows/Linux/macOS)"
+edition.workspace = true
+version.workspace = true
+
+[[bin]]
+name = "R-Board-Service"
+path = "src/main.rs"
+
+[dependencies]
+protocol = { path = "../protocol" }
+clipboard-win = "5"
+windows-future = "0.3"
+tray-icon = "0.19"
+tao = "0.31"
+windows = { version = "0.62", features = [
+    "Foundation",
+    "Win32_UI_WindowsAndMessaging",
+    "Devices_Bluetooth",
+    "Devices_Bluetooth_Rfcomm",
+    "Devices_Enumeration",
+    "Networking_Sockets",
+    "Storage_Streams",
+] }
+
+[build-dependencies]
+winres = "0.1"

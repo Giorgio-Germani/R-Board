@@ -16,3 +16,4 @@ tools/*.txt
 *.diff
 *.sh
 dictation/.cxx/
+desktop/target/

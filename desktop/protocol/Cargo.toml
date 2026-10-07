@@ -1,0 +1,8 @@
+[package]
+name = "protocol"
+description = "RCS-1 clipboard sync wire codec (REVENTOR)"
+edition.workspace = true
+version.workspace = true
+
+[dependencies]
+sha2 = "0.10"
