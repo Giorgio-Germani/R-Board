@@ -77,16 +77,22 @@ class DictationController(private val ime: InputMethodService) {
         main.post {
         val existing = overlay
         if (existing != null) {
+            Log.d(TAG, "overlay: reusing existing view")
             existing.visibility = View.VISIBLE
             return@post
         }
         val content = ime.window?.findViewById(android.R.id.content) as? android.view.ViewGroup
-            ?: return@post
+        if (content == null) {
+            Log.w(TAG, "overlay: no window/content — retrying")
+            main.postDelayed({ showOverlay() }, 100)
+            return@post
+        }
         val kbId = ime.resources.getIdentifier("keyboard_view", "id", ime.packageName)
         val kbView = if (kbId != 0) content.findViewById<View>(kbId) else null
         val kbParent = kbView?.parent as? android.view.ViewGroup
         if (kbView == null || kbParent == null || kbView.width == 0 || kbView.height == 0) {
             // keyboard not laid out yet — retry shortly
+            Log.w(TAG, "overlay: keyboard view not ready (kbId=$kbId view=${kbView != null}, parent=${kbParent != null}, size=${kbView?.width}x${kbView?.height}) — retrying")
             main.postDelayed({ showOverlay() }, 100)
             return@post
         }
