@@ -32,8 +32,6 @@ class DictationController(private val ime: InputMethodService) {
         private const val TAG = "ReventorDictation"
         private const val SAMPLE_RATE = 16_000
         private const val MAX_SAMPLES = SAMPLE_RATE * 30
-        private const val VOICE_RMS_THRESHOLD = 0.01f // above typical room noise, below speech
-        private const val TAP_MAX_DURATION = 350L // presses shorter than this keep recording after release
 
         /** Language codes the dictation engine can recognize (whistle model). */
         @JvmField
@@ -68,9 +66,6 @@ class DictationController(private val ime: InputMethodService) {
 
     @Volatile
     private var pendingRelease = false
-
-    @Volatile
-    private var pressStartedAt = 0L
 
     @Volatile
     private var sessionActive = false
@@ -138,15 +133,14 @@ class DictationController(private val ime: InputMethodService) {
         main.post { overlay?.visibility = View.INVISIBLE }
     }
 
-    /** Key-down on the layout voice key: start recording (tap) or push-to-talk (hold). */
+    /** Key-down on the layout voice key: start push-to-talk. */
     fun onPressStart() {
         Log.d(TAG, "onPressStart: engine available=${NeedleEngine.available()}")
         gestureHandled = false
         pendingRelease = false
         if (!NeedleEngine.available()) return // no native lib (wrong ABI) → legacy voice IME
         gestureHandled = true
-        pressStartedAt = android.os.SystemClock.uptimeMillis()
-        lastGestureAt = pressStartedAt
+        lastGestureAt = android.os.SystemClock.uptimeMillis()
         if (!hasMicPermission()) {
             launchPermissionActivity()
             return
@@ -154,21 +148,12 @@ class DictationController(private val ime: InputMethodService) {
         executor.execute { prepareAndStartRecording() }
     }
 
-    /**
-     * Key-up on the layout voice key. A quick tap keeps recording — silence
-     * auto-stop (or a second tap) finalizes. A long press is push-to-talk:
-     * releasing stops and transcribes.
-     */
+    /** Key-up on the layout voice key: stop and transcribe. */
     fun onPressEnd() {
         Log.d(TAG, "onPressEnd: gestureHandled=$gestureHandled sessionActive=$sessionActive")
         if (!gestureHandled) return
         gestureHandled = false
         lastGestureAt = android.os.SystemClock.uptimeMillis()
-        val quickTap = android.os.SystemClock.uptimeMillis() - pressStartedAt < TAP_MAX_DURATION
-        if (quickTap) {
-            pendingRelease = false
-            return
-        }
         pendingRelease = true
         if (sessionActive) finalizeOnExecutor()
     }
@@ -255,7 +240,6 @@ class DictationController(private val ime: InputMethodService) {
         rec.startRecording()
         readerThread = Thread {
             val tmp = FloatArray(SAMPLE_RATE / 25) // 40 ms — amplitude granularity for the waveform
-            var samplesSinceVoice = 0 // speech activity tracker for auto-stop
             while (recording && totalSamples < MAX_SAMPLES) {
                 val n = rec.read(tmp, 0, tmp.size, AudioRecord.READ_BLOCKING)
                 if (n > 0) {
@@ -270,15 +254,6 @@ class DictationController(private val ime: InputMethodService) {
                     }
                     val rms = kotlin.math.sqrt(sum / n)
                     overlay?.pushAmplitude(rms.toFloat()) // thread-safe (postInvalidateOnAnimation)
-                    if (rms > VOICE_RMS_THRESHOLD) samplesSinceVoice = 0
-                    else samplesSinceVoice += n
-                    // tap mode: finalize automatically after 2 s without speech
-                    // (not while the key is held — a pause mid-sentence must not cut the user off)
-                    if (!gestureHandled && totalSamples > SAMPLE_RATE && samplesSinceVoice > 2 * SAMPLE_RATE) {
-                        Log.d(TAG, "auto-finalize: ${"%.1f".format(totalSamples / SAMPLE_RATE.toFloat())} s recorded, silence detected")
-                        finalizeOnExecutor()
-                        break
-                    }
                 }
             }
             // hit the 30 s cap with nobody pressing stop (user walked away) — auto-finalize
