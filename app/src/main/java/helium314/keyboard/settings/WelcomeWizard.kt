@@ -295,6 +295,24 @@ fun WelcomeWizard(
                 }
             }
     }
+    // always-available exit so the user can finish setup without going through all steps
+    @Composable fun OkRow() {
+        Spacer(Modifier.height(16.dp))
+        Row(
+            Modifier.clickable { close() }
+                .background(color = stepBackgroundColor)
+                .padding(16.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Icon(
+                painterResource(R.drawable.ic_setup_check),
+                null,
+                Modifier.padding(end = 6.dp).size(32.dp),
+                tint = textColor
+            )
+            Text(stringResource(android.R.string.ok), Modifier.weight(1f))
+        }
+    }
     Surface {
         CompositionLocalProvider(
             LocalContentColor provides textColor,
@@ -305,18 +323,22 @@ fun WelcomeWizard(
                 contentAlignment = Alignment.Center
             ) {
                 if (useWideLayout)
-                    Row {
-                        Box(Modifier.weight(0.4f)) {
-                            bigText()
+                    Column {
+                        Row {
+                            Box(Modifier.weight(0.4f)) {
+                                bigText()
+                            }
+                            Box(Modifier.weight(0.6f)) {
+                                steps()
+                            }
                         }
-                        Box(Modifier.weight(0.6f)) {
-                            steps()
-                        }
+                        OkRow()
                     }
                 else
                     Column {
                         bigText()
                         steps()
+                        OkRow()
                     }
             }
         }

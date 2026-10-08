@@ -7,6 +7,7 @@ import android.net.Uri
 import android.os.Bundle
 import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
+import androidx.core.content.edit
 import androidx.activity.ComponentActivity
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.Column
@@ -35,6 +36,7 @@ import helium314.keyboard.latin.InputAttributes
 import helium314.keyboard.latin.R
 import helium314.keyboard.latin.common.FileUtils
 import helium314.keyboard.latin.define.DebugFlags
+import helium314.keyboard.latin.settings.Defaults
 import helium314.keyboard.latin.settings.Settings
 import helium314.keyboard.latin.utils.BackButton
 import helium314.keyboard.latin.utils.DeviceProtectedUtils
@@ -47,6 +49,7 @@ import helium314.keyboard.latin.utils.UncachedInputMethodManagerUtils
 import helium314.keyboard.latin.utils.cleanUnusedMainDicts
 import helium314.keyboard.latin.utils.prefs
 import helium314.keyboard.settings.dialogs.ConfirmationDialog
+import helium314.keyboard.settings.dialogs.GestureLibDownloadDialog
 import helium314.keyboard.settings.dialogs.NewDictionaryDialog
 import helium314.keyboard.settings.screens.gesturedata.END_DATE_EPOCH_MILLIS
 import helium314.keyboard.settings.screens.gesturedata.TWO_WEEKS_IN_MILLIS
@@ -101,6 +104,11 @@ open class SettingsActivity : ComponentActivity(), SharedPreferences.OnSharedPre
                         !UncachedInputMethodManagerUtils.isThisImeCurrent(this, imm)
                                 || !UncachedInputMethodManagerUtils.isThisImeEnabled(this, imm)
                     ) }
+                    var showGestureLibPrompt by rememberSaveable { mutableStateOf(
+                        !BuildConfig.BUILD_TYPE.equals("nouserlib")
+                                && prefs.getBoolean(Settings.PREF_GESTURE_INPUT, Defaults.PREF_GESTURE_INPUT)
+                                && !JniUtils.sHaveGestureLib
+                    ) }
                     if (spellchecker)
                         Scaffold(contentWindowInsets = WindowInsets.safeDrawing) { innerPadding ->
                             Column(Modifier.padding(innerPadding)) {
@@ -121,6 +129,12 @@ open class SettingsActivity : ComponentActivity(), SharedPreferences.OnSharedPre
                         SettingsNavHost(onClickBack = { this.finish() })
                         if (showWelcomeWizard) {
                             WelcomeWizard(close = { showWelcomeWizard = false }, finish = this::finish)
+                        } else if (showGestureLibPrompt) {
+                            GestureLibDownloadDialog(onDeclined = {
+                                showGestureLibPrompt = false
+                                // declining swiping disables it, so the prompt will not come back
+                                prefs.edit { putBoolean(Settings.PREF_GESTURE_INPUT, false) }
+                            })
                         } else if (crashReports.isNotEmpty()) {
                             val ctx = LocalContext.current
                             ConfirmationDialog(

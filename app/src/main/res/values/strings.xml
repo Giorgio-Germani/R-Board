@@ -184,6 +184,20 @@
     <string name="gesture_input">Enable gesture typing</string>
     <!-- Description for "gesture_input" option. The user can input a word by tracing the letters of a word without releasing the finger from the screen.-->
     <string name="gesture_input_summary">Input a word by sliding through the letters</string>
+    <!-- Title of the prompt offering to download the external glide typing library. -->
+    <string name="gesture_lib_auto_prompt_title">Enable swiping?</string>
+    <!-- Message of the prompt offering to download the external glide typing library. -->
+    <string name="gesture_lib_auto_prompt_message">Swiping (glide) typing needs an external closed-source component (about 1 MB) that will be downloaded once and verified with a checksum.\n\nDo you want to enable swiping? If you decline, swiping will stay off.</string>
+    <!-- Button to accept the glide typing library download. -->
+    <string name="gesture_lib_auto_confirm">Yes, enable swiping</string>
+    <!-- Button to decline the glide typing library download. -->
+    <string name="gesture_lib_auto_decline">No</string>
+    <!-- Shown while the glide typing library is being downloaded. -->
+    <string name="gesture_lib_auto_downloading">Downloading swiping component…</string>
+    <!-- Shown when the glide typing library download failed. -->
+    <string name="gesture_lib_auto_download_failed">Download failed. Check your internet connection and try again.</string>
+    <!-- Button to retry the glide typing library download. -->
+    <string name="gesture_lib_auto_retry">Retry</string>
     <!-- Option to enable gesture trail preview. The user can see a trail of the gesture during gesture input.-->
     <string name="gesture_preview_trail">Show gesture trail</string>
     <!-- Option to enable gesture floating text preview. The user can see a suggested word floating above the keyboard during a gesture input.-->
