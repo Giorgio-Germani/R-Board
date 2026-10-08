@@ -32,6 +32,7 @@ class DictationController(private val ime: InputMethodService) {
         private const val TAG = "ReventorDictation"
         private const val SAMPLE_RATE = 16_000
         private const val MAX_SAMPLES = SAMPLE_RATE * 30
+        private const val VOICE_RMS_THRESHOLD = 0.01f // above typical room noise, below speech
 
         /** Language codes the dictation engine can recognize (whistle model). */
         @JvmField
@@ -240,6 +241,7 @@ class DictationController(private val ime: InputMethodService) {
         rec.startRecording()
         readerThread = Thread {
             val tmp = FloatArray(SAMPLE_RATE / 25) // 40 ms — amplitude granularity for the waveform
+            var samplesSinceVoice = 0 // speech activity tracker for auto-stop
             while (recording && totalSamples < MAX_SAMPLES) {
                 val n = rec.read(tmp, 0, tmp.size, AudioRecord.READ_BLOCKING)
                 if (n > 0) {
@@ -254,6 +256,15 @@ class DictationController(private val ime: InputMethodService) {
                     }
                     val rms = kotlin.math.sqrt(sum / n)
                     overlay?.pushAmplitude(rms.toFloat()) // thread-safe (postInvalidateOnAnimation)
+                    if (rms > VOICE_RMS_THRESHOLD) samplesSinceVoice = 0
+                    else samplesSinceVoice += n
+                    // tap mode: finalize automatically after 2 s without speech
+                    // (not while the key is held — a pause mid-sentence must not cut the user off)
+                    if (!gestureHandled && totalSamples > SAMPLE_RATE && samplesSinceVoice > 2 * SAMPLE_RATE) {
+                        Log.d(TAG, "auto-finalize: ${"%.1f".format(totalSamples / SAMPLE_RATE.toFloat())} s recorded, silence detected")
+                        finalizeOnExecutor()
+                        break
+                    }
                 }
             }
             // hit the 30 s cap with nobody pressing stop (user walked away) — auto-finalize

@@ -99,12 +99,12 @@
     <string name="settings_no_limit">Ingen gräns</string>
     <string name="prefs_long_press_keyboard_to_change_lang_summary">Långtryckning på mellanslagstangenten öppnar menyn för val av inmatningsmetod</string>
     <string name="prefs_long_press_keyboard_to_change_lang">Ändra inmatningsmetod med mellanslagstangenten</string>
-    <string name="spell_checker_service_name">REVENTORs stavningskontroll</string>
-    <string name="android_spell_checker_settings">Inställningar för REVENTORs stavningskontroll</string>
+    <string name="spell_checker_service_name">R-Boards stavningskontroll</string>
+    <string name="android_spell_checker_settings">Inställningar för R-Boards stavningskontroll</string>
     <string name="number_row">Sifferrad</string>
     <string name="number_row_summary">Visa alltid sifferraden</string>
     <string name="show_emoji_key">Emoji-tangent</string>
-    <string name="ime_settings">REVENTOR-inställningar</string>
+    <string name="ime_settings">R-Board-inställningar</string>
     <string name="show_hints_summary">Visa tips för långtryckning</string>
     <string name="settings_category_additional_keys">Ytterligare tangenter</string>
     <string name="settings_category_clipboard_history">Urklippshistorik</string>
@@ -441,47 +441,13 @@
     <string name="number_row_in_symbols">Visa sifferraden i symbolvyn</string>
     <string name="custom_emoji_font">Ange eget emoji-teckensnitt från fil</string>
     <string name="layout_functional_keys_khipro" tools:keep="@string/layout_functional_keys">Funktionstangenter (Khipro)</string>
-    <string name="gesture_data_screen">Insamling av gestdata</string>
-    <string name="gesture_data_info">Vad är det här?</string>
-    <string name="gesture_data_privacy">Integritet</string>
-    <string name="gesture_data_get_data">Dela gestdatafil</string>
-    <string name="gesture_data_delete_data">Rensa gestdata</string>
-    <string name="gesture_data_send_mail">Skicka data via e-post</string>
-    <string name="gesture_data_copy_mail">Kopiera e-postadress</string>
-    <string name="gesture_data_mail_use">Observera att e-postadressen är avsedd för datainskick; du får kanske inte snabba eller konsekventa svar.</string>
-    <string name="gesture_data_please_type">Skriv med gest:</string>
-    <string name="gesture_data_next_save">Fick %s. Tryck om du är säker på att du gjorde rätt gest</string>
-    <string name="gesture_data_next">Hoppa över ord</string>
-    <string name="gesture_data_active_count">%1$s ord i den här sessionen, %2$s ord totalt (%3$s har redan skickats eller tagits bort)</string>
-    <string name="gesture_data_review_screen_title">Granska och dela gestdata</string>
-    <string name="gesture_data_words_selected">%s ord</string>
-    <string name="gesture_data_date_range">Datumintervall</string>
-    <string name="gesture_data_much_data">Du har mycket data som inte har skickats in. Skicka den och ta sedan bort den gamla datan.</string>
-    <string name="gesture_data_how_to_use">Så här använder du funktionen</string>
-    <string name="gesture_data_active_start">Starta aktiv insamling</string>
-    <string name="gesture_data_active_stop">Stoppa aktiv insamling</string>
-    <string name="gesture_data_ends_at">Insamlingsfasen för gestdata slutar %s. Skicka in din data före det datumet.</string>
-    <string name="gesture_data_ended">Insamlingsfasen för gestdata slutade %s. Du kan dela befintlig data men inte lägga till ny.</string>
-    <string name="gesture_data_share_all">Dela alla %s ord</string>
-    <string name="gesture_data_share_new">Dela %s ord som inte tidigare har skickats in</string>
-    <string name="gesture_data_delete_dialog">Du har data för %1$s nya och %2$s redan delade ord.</string>
-    <string name="gesture_data_delete_dialog_all">Ta bort alla %s ord</string>
-    <string name="gesture_data_delete_dialog_confirm">Är du säker? Detta tar bort %s ord. Kontrollera att din delade data har skickats in!</string>
-    <string name="gesture_data_delete_dialog_submitted">Ta bort %s inskickade ord</string>
-    <string name="gesture_data_many_not_shared_words">Du har fler än %s ord som väntar på att skickas in</string>
     <string name="emoji_search_title">Sök emoji</string>
     <string name="search_field_placeholder">Sök</string>
-    <string name="gesture_data_promotion_message">Hej!\n Eftersom du installerade biblioteket för gestinmatning kanske du är intresserad av REVENTORs projekt för att skapa ett helt öppet bibliotek för gestinmatning. Du kan hjälpa till genom att bidra med gestdata. Mer information finns på skärmen för insamling av gestdata.</string>
-    <string name="gesture_data_reminder_message">Hej!\n Du använde tidigare insamlingen av gestdata, men har inte lagt till data på ett tag. Vill du bidra igen?</string>
     <string name="ask_later">Fråga mig senare</string>
-    <string name="gesture_data_take_me_there">Ta mig dit</string>
     <string name="timestamp_description">Du kan lägga till tidsstämpeltangenten med en egen layout som har tangenten ”timestamp”, eller tangentkod -10043</string>
     <string name="prefs_bottom_row_scale">Skala för nedre raden</string>
-    <string name="gesture_data_links">Information om aktiv insamling:</string>
     <string name="toolbar_swipe_down_to_hide">Dölj tangentbordet med ett svep</string>
     <string name="toolbar_swipe_down_to_hide_summary">Svep nedåt på verktygsfältet för att stänga tangentbordet</string>
-    <string name="gesture_data_please_switch_keyboard">Byt till %s</string>
-    <string name="gesture_data_share_limit">För att undvika att storleksgränser överskrids exporteras endast de första %s orden</string>
     <string name="folded">Vikt</string>
     <string name="custom_punctuation_suggestions">Ange skiljeteckensförslag</string>
     <string name="space_swipe_touchpad_mode_entry">Pekplatteläge</string>
@@ -499,32 +465,7 @@
     <string name="item_description">Beskrivning: %s</string>
     <string name="item_type">Typ: %s</string>
     <string name="abbreviation_unit_mb">%s MB</string>
-    <string name="gesture_data_share_duplicate">Du kan dela redan inskickad data igen om du är osäker på att den togs emot korrekt. Dubbletter identifieras och tas bort när datan behandlas.</string>
-    <string name="gesture_data_active">Aktiv insamling</string>
-    <string name="background_gesture_data_links">Information om insamling i bakgrunden:</string>
-    <string name="gesture_data_background_gathering_switch">Använd insamling av bakgrundsdata</string>
-    <string name="gesture_data_background_gathering_allowed_apps">Tillåtna appar: %s</string>
-    <string name="gesture_data_background_gathering_manual_save">Kasta bort som standard</string>
-    <string name="gesture_data_background_gathering_manual_save_summary">Data sparas manuellt med verktygsfältstangenten</string>
-    <string name="gesture_data_background_gathering_info">Mer information</string>
-    <string name="gesture_data_background_gathering_indicator">Indikator för datainsamling</string>
-    <string name="gesture_data_background_gathering_control">Så styr du vad som sparas</string>
-    <string name="gesture_data_background_apps_button">Hantera tillåtna appar</string>
-    <string name="gesture_data_background_apps">Välj appar som ska ingå i insamlingen av bakgrundsdata</string>
-    <string name="gesture_data_background_apps_include_default">Inkludera appar som standard</string>
-    <string name="gesture_data_background_excluded_words_button">Hantera uteslutna ord</string>
-    <string name="gesture_data_background_dictionary">Ordbok: %s</string>
-    <string name="gesture_data_background_position">Position: %s</string>
-    <string name="gesture_data_background_exclude_words">Uteslut ord från insamling i bakgrunden</string>
-    <string name="gesture_data_long_press_select_hint">Långtryck för att välja</string>
     <string name="background_gathering" tools:keep="@string/background_gathering">Insamling av bakgrundsdata</string>
-    <string name="gesture_data_show_active">Visa aktivt insamlad data</string>
-    <string name="gesture_data_show_background">Visa bakgrundsdata</string>
-    <string name="gesture_data_include_shared">Inkludera redan inskickad data</string>
-    <string name="gesture_data_shared">inskickad</string>
-    <string name="gesture_data_saving">Sparar … %s%%</string>
-    <string name="gesture_data_add_key">Lägg till verktygsfältstangent</string>
-    <string name="gesture_data_swipe_o_scope">Verktyg för att visualisera gestdata: &lt;a href=%s&gt;Swipe-O-Scope&lt;/a&gt;</string>
     <string name="subtype_generic_4row">%s (4 rader)</string>
     <string name="about_community_links">Gemenskapslänkar</string>
     <string name="about_community_links_description">Teman, layoutredigerare, diskussioner, …</string>
@@ -536,16 +477,5 @@
     <string name="space_swipe_toggle_dpad_entry">Växla styrkors</string>
     <string name="recent_emojis_cleared">Senaste emoji rensade</string>
     <string name="show_dpad_key">Styrkorstangent</string>
-    <string name="gesture_data_description">&lt;b&gt;Välkommen till skärmen för insamling av gestdata!&lt;/b&gt;&lt;br/&gt;&lt;br/&gt; Detta ingår i ett &lt;a href=https://nlnet.nl/project/GestureTyping&gt;NLnet-finansierat projekt&lt;/a&gt; som strävar efter att skapa ett helt öppet bibliotek för gestinmatning som kan ersätta Googles slutna bibliotek.&lt;br/&gt; Resultatet är tänkt som en enkel ersättning för AOSP-baserade tangentbord, men kan även användas med andra tangentbord, till exempel FlorisBoard.&lt;br/&gt;&lt;br/&gt; För att utveckla biblioteket är det mycket värdefullt med detaljerad gestdata från olika språk och användare.&lt;br/&gt; Genom att samla in och skicka gestdata kan du bidra till en öppen datamängd som används för att utveckla biblioteket. Datamängden publiceras under licensen CC BY-SA 4.0 en tid efter att insamlingsfasen är klar den %s. När du har samlat data kan du skicka den med delningsikonen längst ned på skärmen.</string>
-    <string name="gesture_data_description_modes">Det ”säkra” sättet att bidra är läget &lt;i&gt;aktiv insamling&lt;/i&gt;, där du får se ett visst ord och skriver det med gestinmatning.&lt;br&gt; Du kan även använda läget &lt;i&gt;insamling i bakgrunden&lt;/i&gt;, där du kan lämna exempel från din vanliga gestinmatning i andra appar. Eftersom detta är känsligt är funktionen frivillig, konfigurerbar och har en granskningsskärm för data som du tänker skicka.</string>
-    <string name="gesture_data_description_privacy">Integritet\n\n Datan du skickar består av målord, tangentbordslayout och dimensioner, gest (tider och koordinater), förslag från det aktuella biblioteket, hashvärde för använda ordböcker, appversion, insamlingsläge, om biblioteket för gestinmatning är Googles standardbibliotek samt ett ID för varje gest.\n Inskickad data hämtas och raderas från ProtonMail-brevlådan där den lagras så snart som möjligt. När insamlingsfasen för gestdata har avslutats publiceras den samlade datamängden från alla användare under licensen Creative Commons BY-SA 4.0.\n\n För att skydda din integritet anges du inte uttryckligen som upphovsperson. Ditt erkännande blir ”The REVENTOR Gesture Data Project Contributors”. Det ska inte gå att koppla data som du skapar på den här skärmen till din identitet. Det kan dock gå att avgöra vilka gester som gjordes av samma person, exempelvis utifrån en egen tangentbordslayout, tangentbordets dimensioner, språk eller individuell geststil.</string>
-    <string name="gesture_data_active_description">Tryck på &lt;i&gt;Starta aktiv insamling&lt;/i&gt;, byt vid behov ordbok och börja skriva det visade ordet med gestinmatning.&lt;br/&gt; Om din gest motsvarar ordet sparas datan och nästa ord visas. Annars kan du försöka igen, hoppa över ordet eller bekräfta att du gjorde rätt gest.&lt;br/&gt; Du kan bara använda ordböcker som ingår i appen eller finns i &lt;a href=%s&gt;ordboksförrådet&lt;/a&gt;; inga andra ord används.</string>
-    <string name="gesture_data_email_body">VIKTIGT:\n\n Hej!\n Som en påminnelse delas denna data offentligt under licensen CC BY-SA 4.0 och du anges inte som upphovsperson för att skydda din integritet.\n\n Tack för att du delar rättigheterna till din data med oss. Den kommer till användning!\n\n Observera att en ändring av formuleringen i detta meddelande inte ändrar vad vi gör med din data. Det är inte ett avtal som kan ändras, utan bara en vänlig påminnelse!\n Om du vill skicka ett meddelande tillsammans med din data skriver du det under raden här.\n ---------------------------------------------</string>
-    <string name="gesture_data_background_gathering_info_message">När du aktiverar insamling av bakgrundsdata kan REVENTOR registrera gester du skriver i andra appar. Det är mycket användbart för projektet med gestinmatning eftersom det kan ge stora mängder data, om än med lägre kvalitet än aktiv insamling. Insamling i bakgrunden ersätter inte aktivt insamlad data utan är ett komplement, eftersom datakvalitet är viktigare än mängd.\n\n Insamling i bakgrunden kan samla in data som du kan anse vara för privat för att dela, även om den publiceras anonymt. Därför vill vi förklara när gestdata samlas in och hur du kan påverka det.\n\n I länkdelen längst ned till höger på skärmen finns en video med mer information om insamling av bakgrundsdata.</string>
-    <string name="gesture_data_background_gathering_indicator_message">När gestdata kan registreras ser du en indikatorikon längst ned till vänster på tangentbordet. När cirkeln är fylld har minst en gest samlats in och väntar på att sparas. Data sparas antingen med verktygsfältstangenten (se &lt;i&gt;%1$s&lt;/i&gt;) eller automatiskt (när &lt;i&gt;%2$s&lt;/i&gt; är inaktiverad). Automatisk sparning sker vanligen när du byter textfält eller stänger tangentbordet, men kan också ske om textfältet ändras av någon annan anledning. När data sparas blir indikatorn grön en kort stund.</string>
-    <string name="gesture_data_first_enable_dialog">Välkommen till insamling av bakgrundsdata!&lt;br&gt; Vill du lägga till tangenten &lt;i&gt;%1$s&lt;/i&gt; i verktygsfältet? Du kan använda den för att styra datainsamlingen och läsa mer med knappen &lt;i&gt;%2$s&lt;/i&gt;. &lt;br&gt;&lt;br&gt; Insamling i bakgrunden är som standard inaktiverad för alla appar. Det innebär att inget samlas in förrän du väljer vilka appar som tillåts. Du kan ändra detta %3$s.</string>
-    <string name="gesture_data_no_known_dict">Insamling i bakgrunden samlar endast ord från ordböcker som ingår i appen eller finns i &lt;a href=%s&gt;ordboksförrådet&lt;/a&gt;. Du har för närvarande ingen sådan ordbok aktiverad.</string>
     <string name="hidden_features_message">► Långtryck på fästa verktygsfältstangenter ger ytterligare funktioner: &lt;br&gt; \n\t• urklipp &amp;#65515; klistra in &lt;br&gt; \n\t• flytta vänster/höger &amp;#65515; ord vänster/höger &lt;br&gt; \n\t• flytta upp/ned &amp;#65515; sida upp/ned &lt;br&gt; \n\t• ord vänster/höger &amp;#65515; radens början/slut &lt;br&gt; \n\t• sida upp/ned &amp;#65515; sidans början/slut &lt;br&gt; \n\t• kopiera &amp;#65515; klipp ut &lt;br&gt; \n\t• markera ord &amp;#8596; markera allt &lt;br&gt; \n\t• ångra &amp;#8596; gör om &lt;br&gt; &lt;br&gt; \n► Långtryck på tangenter i förslagsradens verktygsfält fäster dem på förslagsraden. &lt;br&gt; &lt;br&gt; \n► Långtryck på kommatangenten för att öppna urklippsvyn, emojivyn, enhandsläge, inställningar eller språkbyte: &lt;br&gt; \n\t• Emojivyn och språkbyte försvinner om motsvarande tangent är aktiverad; &lt;br&gt; \n\t• I vissa layouter är det inte kommatangenten utan tangenten på samma plats (t.ex. ”q” i Dvorak-layouten). &lt;br&gt; &lt;br&gt; \n► I inkognitoläge lärs inga ord in och inga emoji läggs till bland senaste. &lt;br&gt; &lt;br&gt; \n► Tryck på inkognitoikonen för att öppna verktygsfältet. &lt;br&gt; &lt;br&gt; \n► Svepande tangentinmatning: svep från skift till en annan tangent för att skriva en enskild versal: &lt;br&gt; \n\t• Detta fungerar även för tangenten ”?123” för att skriva en enskild symbol från symboltangentbordet samt för relaterade tangenter. &lt;br&gt; &lt;br&gt; \n► Håll ned skift- eller symboltangenten, tryck på en eller flera tangenter och släpp sedan skift- eller symboltangenten för att återgå till föregående tangentbord. &lt;br&gt; &lt;br&gt; \n► Långtryck på ett förslag på förslagsraden för att visa fler förslag och en raderingsknapp som tar bort förslaget. &lt;br&gt; &lt;br&gt; \n► Svep uppåt från ett förslag för att öppna fler förslag och släpp på förslaget för att välja det. &lt;br&gt; &lt;br&gt; \n► Långtryck på en post i urklippshistoriken för att fästa den (behåll den i urklippet tills du lossar den). &lt;br&gt; &lt;br&gt; \n► Svep åt vänster i urklippsvyn för att ta bort en post (utom när den är fäst). &lt;br&gt; &lt;br&gt; \n► Markera text och tryck på skift för att växla mellan versaler, gemener och stor bokstav i ord. &lt;br&gt; &lt;br&gt; \n► Du kan lägga till ordböcker genom att öppna dem i en filhanterare: &lt;br&gt; \n\t• Detta fungerar endast med &lt;i&gt;content-URI:er&lt;/i&gt;, inte &lt;i&gt;file-URI:er&lt;/i&gt;, vilket innebär att det kanske inte fungerar med vissa filhanterare. &lt;br&gt; &lt;br&gt; \n► För användare som gör manuella säkerhetskopior med rootåtkomst: &lt;br&gt; \n\t• Från Android 7 finns filen med delade inställningar inte på standardplatsen eftersom appen använder %s. Det krävs för att inställningarna ska kunna läsas innan enheten låses upp, till exempel vid start; &lt;br&gt; \n\t• Filen finns i /data/user_de/0/package_id/shared_prefs/, men detta kan bero på enhet och Android-version. &lt;br&gt; &lt;br&gt; \n&lt;i&gt;&lt;b&gt;Felsökningsläge/felsöknings-APK&lt;/b&gt;&lt;/i&gt; &lt;br&gt; &lt;br&gt; \n► Långtryck på ett förslag för att visa källordboken. &lt;br&gt; &lt;br&gt; \n► Med felsöknings-APK finns felsökningsinställningar under avancerade inställningar, även om de främst är användbara för att skriva ordböcker till loggen. &lt;br&gt; \n\t• Med en utgivnings-APK måste du trycka flera gånger på versionen i &lt;i&gt;Om&lt;/i&gt;; därefter finns felsökningsinställningarna under &lt;i&gt;Avancerade inställningar&lt;/i&gt;. &lt;br&gt; \n\t• När &lt;i&gt;Visa förslagsinformation&lt;/i&gt; aktiveras visas små siffror över förslagen med intern poäng och källordbok. &lt;br&gt; &lt;br&gt; \n► Vid en appkrasch får du frågan om du vill ha kraschloggarna när du öppnar inställningarna. &lt;br&gt; &lt;br&gt; \n► Vid flerspråkig inmatning visar blankstegstangenten ett konfidensvärde som används för att avgöra vilket språk som används. &lt;br&gt; &lt;br&gt; \n► Förslag visar små siffror över sig med intern poäng och källordbok (kan inaktiveras).</string>
-    <string name="gesture_data_background_gathering_control_message">Oberoende av inställningarna är insamling av bakgrundsdata inaktiverad i inkognitoläge. Den är också inaktiverad för inmatningsfält som är markerade som känsliga (lösenord, e-post eller när inmatningsfältet ber tangentbordet att inte lära sig orden). Endast ord som finns i en huvudordbok (inbyggd eller från &lt;a href=%5$s&gt;ordboksförrådet&lt;/a&gt;) samlas in. &lt;br&gt;&lt;br&gt; Med &lt;i&gt;%1$s&lt;/i&gt; kan du välja vilka appar som får använda insamling av bakgrundsdata. Standardinställningen inaktiverar alla appar och kräver opt-in per app. Du kan i stället aktivera alla appar och välja bort enskilda appar. Det är bekvämare, men tillåter automatiskt insamling från nyinstallerade appar och kan samla data som du inte förväntade dig. &lt;br&gt;&lt;br&gt; Med &lt;i&gt;%2$s&lt;/i&gt; kan du utesluta särskilda känsliga ord. När du gör en gest för ett uteslutet ord visar indikatorn fortfarande den fyllda ikonen (”data väntar på att sparas”), men datan kastas bort när den annars skulle ha sparats. Blockerade ord som redan sparats innan de blockerades kastas bort vid export.&lt;br&gt; Obs! Insamling i bakgrunden samlar bara ord som redan finns i en huvudordbok, så de ord som normalt behöver blockeras är vanliga ord som kan identifiera dig personligen, till exempel ditt namn, gata, stad eller område. &lt;br&gt;&lt;br&gt; När &lt;i&gt;%3$s&lt;/i&gt; är aktiverad sparas data endast om du väljer att göra det manuellt med verktygsfältstangenten &lt;i&gt;%4$s&lt;/i&gt; (se nedan). Om data inte sparas raderas väntande data när inmatningsfältet ändras eller tangentbordet stängs.&lt;br&gt; App- och orduteslutningar gäller fortfarande i detta läge. &lt;br&gt;&lt;br&gt; Verktygsfältstangenten &lt;i&gt;%4$s&lt;/i&gt; kan användas för att styra datainsamlingen. Effekten av ett tryck beror på aktuellt tillstånd: när insamling i bakgrunden är inaktiverad aktiveras den.&lt;br&gt; Ett långt tryck inaktiverar insamlingen i fem minuter.&lt;br&gt; Du kan aktivera insamlingen i bakgrunden tidigare med ett vanligt tangenttryck.&lt;br&gt; När &lt;i&gt;%3$s&lt;/i&gt; är aktiverad sparas väntande data.&lt;br&gt; I annat fall kastas väntande data bort.&lt;br&gt;</string>
-    <string name="gesture_data_background_gathering_review_message">På skärmen &lt;i&gt;%1$s&lt;/i&gt; kan du kontrollera och filtrera insamlad data, radera data som du anser vara för känslig och dela data. Knapparna för radering och delning används för filtrerad data eller markeringen om du använder långtryck för att välja ord. (Observera att den ”vanliga” delningsikonen utanför skärmen &lt;i&gt;%1$s&lt;/i&gt; endast delar data från aktiv insamling.)&lt;br&gt; Ordningen på delad data slumpas, så inget mer än de enskilda orden kan härledas.&lt;br&gt; Om du vill visa fullständig data som lagras för en gest kan du dela den till en fil och läsa in filen i &lt;a href=%2$s&gt;Swipe-O-Scope&lt;a&gt;.</string>
 </resources>

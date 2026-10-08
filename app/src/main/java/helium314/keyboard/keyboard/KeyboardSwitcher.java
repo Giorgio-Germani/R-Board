@@ -77,7 +77,6 @@ public final class KeyboardSwitcher {
     private FrameLayout mStripContainer;
     private ClipboardHistoryView mClipboardHistoryView;
     private TextView mFakeToastView;
-    private ImageView mBackgroundGatheringIndicator;
     private LatinIME mLatinIME;
     private RichInputMethodManager mRichImm;
     private boolean mIsHardwareAcceleratedDrawingEnabled;
@@ -421,27 +420,6 @@ public final class KeyboardSwitcher {
         }, timeMillis);
     }
 
-    public void setBackgroundGatheringIndicator(boolean enabled, boolean hasData, boolean saving) {
-        if (mCurrentInputView == null) return;
-        mBackgroundGatheringIndicator.setVisibility(enabled ? View.VISIBLE : View.GONE);
-        if (!enabled) return;
-        mBackgroundGatheringIndicator.setImageResource(hasData ? R.drawable.btn_keyboard_key_action_normal_lxx_base : R.drawable.ring);
-        setBackgroundGatheringIndicatorPosition();
-        if (!saving) return;
-        mBackgroundGatheringIndicator.setImageTintList(ColorStateList.valueOf(0xff00a000));
-        mBackgroundGatheringIndicator.postDelayed(() -> mBackgroundGatheringIndicator.setImageTintList(ColorStateList.valueOf(0xffa00000)), 1500);
-    }
-
-    private void setBackgroundGatheringIndicatorPosition() {
-        if (mBackgroundGatheringIndicator == null || mBackgroundGatheringIndicator.getVisibility() != View.VISIBLE) return;
-        if (mBackgroundGatheringIndicator.getLayoutParams() instanceof ViewGroup.MarginLayoutParams margin) {
-            Keyboard kb = mKeyboardView.getKeyboard();
-            if (kb != null)
-                margin.topMargin = kb.mOccupiedHeight - KtxKt.dpToPx(16, mCurrentInputView.getResources());
-            mBackgroundGatheringIndicator.setLayoutParams(mBackgroundGatheringIndicator.getLayoutParams());
-        }
-    }
-
     /**
      * Updates state machine to figure out when to automatically switch back to the previous mode.
      */
@@ -567,7 +545,6 @@ public final class KeyboardSwitcher {
         mClipboardStripScrollView = mCurrentInputView.findViewById(R.id.clipboard_strip_scroll_view);
         mSuggestionStripView = mCurrentInputView.findViewById(R.id.suggestion_strip_view);
         mStripContainer = mCurrentInputView.findViewById(R.id.strip_container);
-        mBackgroundGatheringIndicator = mCurrentInputView.findViewById(R.id.backgroundGatheringIndicator);
 
         prefs.registerOnSharedPreferenceChangeListener(mSuggestionStripView);
         prefs.registerOnSharedPreferenceChangeListener(mClipboardHistoryView);
@@ -739,7 +716,6 @@ public final class KeyboardSwitcher {
                 SettingsKt.setFloatingKeyboardEnabled(mThemeContext, enabled);
             if (enabled) FloatingKeyboardUtils.setFloating(mCurrentInputView);
             else FloatingKeyboardUtils.disableFloating(mCurrentInputView);
-            setBackgroundGatheringIndicatorPosition();
         }
 
         @Override

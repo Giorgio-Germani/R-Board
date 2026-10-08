@@ -18,7 +18,6 @@ object Links {
     const val GESTURE_DATA_WIKI = "$WIKI_URL/Tutorial:-How-to-Contribute-Gesture-Data"
     const val BACKGROUND_GESTURE_DATA_VIDEO_PEERTUBE = "https://makertube.net/w/pPywMiF7kjumFfMrQKHzoU"
     const val BACKGROUND_GESTURE_DATA_VIDEO_YOUTUBE = "https://youtu.be/VJLzVEhY2PY"
-    const val BACKGROUND_GESTURE_DATA_WIKI = "$WIKI_URL/Background-Gesture-Data-Gathering"
     const val SWIPE_O_SCOPE = "https://codeberg.org/eclexic/swipe-o-scope"
     const val COMMUNITY_LINKS = "$GITHUB#to-community"
 }

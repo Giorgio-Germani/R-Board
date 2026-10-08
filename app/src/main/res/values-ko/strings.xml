@@ -94,9 +94,9 @@
     <string name="autospace_after_punctuation">마침표 후 자동 띄어쓰기</string>
     <string name="autospace_after_punctuation_summary">새로운 단어를 입력할 때 마침표가 앞에 있다면 자동으로 띄어쓰기</string>
     <string name="select_input_method">"입력 방법 선택"</string>
-    <string name="spell_checker_service_name">REVENTOR 맞춤법 검사기</string>
-    <string name="android_spell_checker_settings">REVENTOR 맞춤법 검사기 설정</string>
-    <string name="ime_settings">REVENTOR 설정</string>
+    <string name="spell_checker_service_name">R-Board 맞춤법 검사기</string>
+    <string name="android_spell_checker_settings">R-Board 맞춤법 검사기 설정</string>
+    <string name="ime_settings">R-Board 설정</string>
     <string name="prefs_force_incognito_mode_summary">새로운 단어 학습 비활성화</string>
     <string name="auto_correction_confidence">자동 교정 정확도</string>
     <string name="settings_category_suggestions">제안</string>
@@ -267,7 +267,6 @@
     <string name="select_color_key_background">키 배경</string>
     <string name="select_color_functional_key_background">기능 키 배경</string>
     <string name="select_color_spacebar_background">스페이스바 배경</string>
-    <string name="gesture_data_background_gathering_info">더 많은 정보</string>
     <string name="prefs_narrow_key_gaps">키 간격 좁게</string>
     <string name="prefs_key_gap_scale">키 간격 크기</string>
     <string name="prefs_bottom_padding_scale">하단 공백 크기</string>
@@ -431,12 +430,6 @@
     <string name="emoji_search_title">이모지 검색</string>
     <string name="search_field_placeholder">검색</string>
     <string name="ask_later">나중에</string>
-    <string name="gesture_data_screen">제스처 데이터 수집</string>
-    <string name="gesture_data_privacy">개인정보</string>
-    <string name="gesture_data_get_data">제스처 데이터 파일 공유</string>
-    <string name="gesture_data_delete_data">제스처 데이터 지우기</string>
-    <string name="gesture_data_send_mail">이메일로 데이터 전송</string>
-    <string name="gesture_data_copy_mail">이메일 주소 복사</string>
     <string name="auto_correct_shortcuts">단축어 자동 교정</string>
     <string name="auto_correct_shortcuts_summary">켜면 자동 교정이 단축어를 단어로 대치</string>
     <string name="auto_correct_capitalized_suggestions">대문자화 제안 자동 교정</string>
@@ -467,7 +460,6 @@
     <string name="var_toolbar_direction">가변 도구 모음 방향</string>
     <string name="spell_check_suggestions">맞춤법 제안 표시</string>
     <string name="spell_check_suggestions_summary">빨간 밑줄이 있는 단어를 선택할 때 제안을 표시합니다. 앱을 기본 맞춤법 검사기로 설정해야 합니다.</string>
-    <string name="gesture_data_swipe_o_scope">제스처 데이터 시각화 도구: &lt;a href=%s&gt;Swipe-O-Scope&lt;/a&gt;</string>
     <string name="gesture_fast_typing_cooldown">빠른 입력 쿨다운</string>
     <string name="gesture_fast_typing_cooldown_instant">항상 즉시 시작</string>
     <string name="locales_with_dict">사전이 있는 언어</string>
