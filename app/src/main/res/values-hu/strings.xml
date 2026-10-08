@@ -248,7 +248,6 @@
     <string name="theme_style">Stílus</string>
     <string name="style_name_Rounded" tools:keep="@string/style_name_Rounded">Lekerekített</string>
     <string name="theme_colors_night">Színek (éjszakai)</string>
-    <string name="theme_navbar">Színes navigációs sáv</string>
     <string name="theme_name_holo_white" tools:keep="@string/theme_name_holo_white">Holo Fehér</string>
     <string name="theme_name_dark" tools:keep="@string/theme_name_dark">Sötét</string>
     <string name="theme_name_black" tools:keep="@string/theme_name_black">Fekete</string>

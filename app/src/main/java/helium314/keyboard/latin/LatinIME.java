@@ -1842,8 +1842,6 @@ public class LatinIME extends InputMethodService implements
     @SuppressWarnings("deprecation")
     private void setNavigationBarColor() {
         final SettingsValues settingsValues = mSettings.getCurrent();
-        if (!settingsValues.mCustomNavBarColor)
-            return;
         final int color = settingsValues.mColors.get(ColorType.NAVIGATION_BAR);
         final Window window = getWindow().getWindow();
         if (window == null)
@@ -1864,9 +1862,6 @@ public class LatinIME extends InputMethodService implements
 
     @SuppressWarnings("deprecation")
     private void clearNavigationBarColor() {
-        final SettingsValues settingsValues = mSettings.getCurrent();
-        if (!settingsValues.mCustomNavBarColor)
-            return;
         final Window window = getWindow().getWindow();
         if (window == null) {
             return;

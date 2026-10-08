@@ -266,7 +266,6 @@
     <string name="theme_name_brown" tools:keep="@string/theme_name_brown">Bruin</string>
     <string name="theme_name_chocolate" tools:keep="@string/theme_name_chocolate">Chocolade</string>
     <string name="theme_name_forest" tools:keep="@string/theme_name_forest">Bos</string>
-    <string name="theme_navbar">Navigatiebalk kleuren</string>
     <string name="auto_user_color">Kleuren automatisch kiezen</string>
     <string name="main_colors">Alleen hoofdkleuren weergeven</string>
     <string name="more_colors">Meer kleuren tonen</string>

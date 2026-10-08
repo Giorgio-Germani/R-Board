@@ -194,7 +194,6 @@ Nouveau dictionnaire:
     <string name="prefs_keyboard_height_scale">Échelle de hauteur du clavier</string>
     <string name="prefs_bottom_padding_scale">Échelle d\'espacement en bas du clavier</string>
     <string name="day_night_mode_summary">L\'apparence suivra les paramètres système</string>
-    <string name="theme_navbar">Colorer la barre de navigation</string>
     <string name="theme_name_light">Clair</string>
     <string name="theme_name_holo_white">Holo Blanc</string>
     <string name="theme_name_dark">Sombre</string>

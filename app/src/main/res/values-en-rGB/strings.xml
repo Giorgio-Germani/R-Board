@@ -142,7 +142,6 @@
     <string name="label_wait_key">"Wait"</string>
     <string name="theme_colors">Colours</string>
     <string name="theme_colors_night">Colours (night)</string>
-    <string name="theme_navbar">Colour navigation bar</string>
     <string name="theme_name_dynamic" tools:keep="@string/theme_name_dynamic">Dynamic colours</string>
     <string name="auto_user_color">Choose colour automatically</string>
     <string name="main_colors">Show main colours only</string>

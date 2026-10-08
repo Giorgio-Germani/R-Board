@@ -332,7 +332,6 @@
     <string name="day_or_night_night">Noite</string>
     <string name="dictionary_settings_category">Dicionários</string>
     <string name="no_dictionary_message">"Sem um dicionário, apenas obterá sugestões de texto digitado anteriormente.&lt;br&gt; \n        Pode descarregar dicionários %1$s, ou verificar se um dicionário para \"%2$s\" pode ser descarregado diretamente %3$s."</string>
-    <string name="theme_navbar">Cor barra de navegação</string>
     <string name="theme_name_dynamic" tools:keep="@string/theme_name_dynamic">Cores dinâmicas</string>
     <string name="theme_name_black" tools:keep="@string/theme_name_black">Preto</string>
     <string name="theme_name_cloudy" tools:keep="@string/theme_name_cloudy">Nublado</string>

@@ -228,7 +228,6 @@
     <string name="user_dict_settings_add_weight_value">Váha:</string>
     <string name="theme_style">Styl</string>
     <string name="style_name_Rounded" tools:keep="@string/style_name_Rounded">Zaoblený</string>
-    <string name="theme_navbar">Obarvit navigační panel</string>
     <string name="theme_name_darker" tools:keep="@string/theme_name_darker">Tmavší</string>
     <string name="theme_name_cloudy" tools:keep="@string/theme_name_cloudy">Oblačný</string>
     <string name="theme_name_sand" tools:keep="@string/theme_name_sand">Písečný</string>

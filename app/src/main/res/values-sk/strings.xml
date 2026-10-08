@@ -368,7 +368,6 @@
     <string name="key_borders">Okraje kláves</string>
     <string name="day_night_mode">Automatický režim deň/noc</string>
     <string name="day_night_mode_summary">Vzhľad sa prispôsobí systémovým nastaveniam</string>
-    <string name="theme_navbar">Farebný navigačný panel</string>
     <string name="theme_name_light" tools:keep="@string/theme_name_light">Svetlý</string>
     <string name="theme_name_holo_white" tools:keep="@string/theme_name_holo_white">Holo biela</string>
     <string name="theme_name_dark" tools:keep="@string/theme_name_dark">Tmavý</string>

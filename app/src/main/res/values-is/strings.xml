@@ -329,7 +329,6 @@
     <string name="remove_redundant_popups">Fjarlægja ónotaða smáglugga</string>
     <string name="replace_dictionary_message">Á í alvörunni að skipta út notanda-viðbætta orðasafninu \"%1$s\"?\n\nFyrirliggjandi orðasafn:\n%2$s\n\nNýtt orðasafn:\n%3$s</string>
     <string name="text_tap_languages">Ýttu á tungumálið til að opna stillingar</string>
-    <string name="theme_navbar">Lita leiðsagnarstikuna</string>
     <string name="prefs_font_scale">Kvarði leturs á lyklaborði</string>
     <string name="prefs_emoji_font_scale">Kvarði leturs í tjáningartáknasýn</string>
     <string name="prefs_side_padding_scale">Kvarði fyllingar til hliðar</string>

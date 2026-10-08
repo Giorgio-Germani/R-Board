@@ -208,7 +208,6 @@
     <string name="day_or_night_day">Gündüz</string>
     <string name="remove_dictionary_message">Kullanıcı tarafından eklenen \"%s\" sözlüğü kaldırılsın mı?</string>
     <string name="theme_name_holo_white" tools:keep="@string/theme_name_holo_white">Holo Beyaz</string>
-    <string name="theme_navbar">Renkli gezinme çubuğu</string>
     <string name="theme_name_user" tools:keep="@string/theme_name_user">Kullanıcı tanımlı</string>
     <string name="select_color_spacebar_background">Boşluk çubuğu arka planı</string>
     <string name="select_color_spacebar_text">Boşluk çubuğu metni</string>

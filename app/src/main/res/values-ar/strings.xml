@@ -277,7 +277,6 @@
     <string name="theme_name_violette" tools:keep="@string/theme_name_violette">البنفسج</string>
     <string name="theme_name_chocolate" tools:keep="@string/theme_name_chocolate">شوكولاتة</string>
     <string name="theme_name_holo_white" tools:keep="@string/theme_name_holo_white">هولو الأبيض</string>
-    <string name="theme_navbar">شريط التنقل الملون</string>
     <string name="hidden_features_text">تخزين محمي بالجهاز</string>
     <string name="hidden_features_summary">أظهِر الميزات التي قد تمر دون أن يلاحظها أحد</string>
     <string name="hidden_features_title">وصف الميزات المخفية</string>

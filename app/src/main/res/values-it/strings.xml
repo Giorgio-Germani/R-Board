@@ -230,7 +230,6 @@
     <string name="dictionary_link_text">qui</string>
     <string name="dictionary_file_error">Errore: Il file non è un dizionario valido</string>
     <string name="hidden_features_text">spazio di archiviazione protetto</string>
-    <string name="theme_navbar">Colora la barra di navigazione</string>
     <string name="theme_name_forest" tools:keep="@string/theme_name_forest">Foresta</string>
     <string name="add_dictionary">Scegli un dizionario da aggiungere. I dizionari in formato .dict possono essere scaricati %s.</string>
     <string name="dictionary_load_error">Errore nel caricamento del dizionario</string>

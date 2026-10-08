@@ -351,7 +351,6 @@
     <string name="style_name_Rounded" tools:keep="@string/style_name_Rounded">Okruglo</string>
     <string name="theme_colors">Boje</string>
     <string name="theme_colors_night">Boje (noćno)</string>
-    <string name="theme_navbar">Oboji navigacijsku traku</string>
     <string name="theme_name_light" tools:keep="@string/theme_name_light">Svijetlo</string>
     <string name="theme_name_holo_white" tools:keep="@string/theme_name_holo_white">Holo bijelo</string>
     <string name="theme_name_dark" tools:keep="@string/theme_name_dark">Tamno</string>

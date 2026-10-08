@@ -222,7 +222,6 @@
     <string name="layout_error">Error de diseño: %s</string>
     <string name="customize_background_image">Establecer imagen de fondo</string>
     <string name="replace_dictionary_message">¿Realmente quieres reemplazar el diccionario de usuario «%1$s»?\n \nDiccionario actual: \n%2$s \n \nDiccionario nuevo: \n%3$s</string>
-    <string name="theme_navbar">Color de la barra de navegación</string>
     <string name="theme_name_darker" tools:keep="@string/theme_name_darker">Modo ultra oscuro</string>
     <string name="setup_step3_action">Configurar el teclado</string>
     <string name="dictionary_settings_category">Diccionarios</string>

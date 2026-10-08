@@ -202,7 +202,6 @@
     <string name="prefs_bottom_padding_scale">Skala för avstånd till nederkant</string>
     <string name="split_spacer_scale">Delningsavstånd</string>
     <string name="main_colors">Visa endast huvudfärger</string>
-    <string name="theme_navbar">Färga navigeringsfält</string>
     <string name="internal_dictionary_summary">Intern huvudordlista</string>
     <string name="popup_order">Välj ordning på popup-tangenter</string>
     <string name="hint_source">Välj tipskälla</string>

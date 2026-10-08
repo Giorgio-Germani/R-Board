@@ -221,7 +221,6 @@
     <string name="user_dict_add_word_button">Adaugă un cuvânt</string>
     <string name="user_dict_word_already_present">Acest cuvânt este deja prezent în dicționarul utilizatorului %s. Introdu altul.</string>
     <string name="theme_colors">Culori</string>
-    <string name="theme_navbar">Bară de navigare colorată</string>
     <string name="theme_name_light" tools:keep="@string/theme_name_light">Luminoasă</string>
     <string name="theme_name_holo_white" tools:keep="@string/theme_name_holo_white">Holo alb</string>
     <string name="theme_colors_night">Culori (noapte)</string>

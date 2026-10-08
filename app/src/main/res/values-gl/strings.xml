@@ -116,7 +116,6 @@
     <string name="key_borders">Bordo da tecla</string>
     <string name="day_night_mode">Modo Auto para día/noite</string>
     <string name="day_night_mode_summary">A aparencia seguirá os axustes do sistema</string>
-    <string name="theme_navbar">Cor da barra de navegación</string>
     <string name="theme_name_light" tools:keep="@string/theme_name_light">Claro</string>
     <string name="theme_name_holo_white" tools:keep="@string/theme_name_holo_white">Branco Holo</string>
     <string name="theme_name_dark" tools:keep="@string/theme_name_dark">Escuro</string>

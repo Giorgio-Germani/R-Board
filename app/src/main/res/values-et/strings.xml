@@ -287,7 +287,6 @@
     <string name="layout_emoji_bottom_row" tools:keep="@string/layout_emoji_bottom_row">Emojide alumine rida</string>
     <string name="layout_clip_bottom_row" tools:keep="@string/layout_clip_bottom_row">Lõikelaua alumine rida</string>
     <string name="day_night_mode_summary">Välimus järgib süsteemi seadistusi</string>
-    <string name="theme_navbar">Navigatsiooniriba värv</string>
     <string name="theme_name_ocean" tools:keep="@string/theme_name_ocean">Ookeanisinine</string>
     <string name="theme_name_pink" tools:keep="@string/theme_name_pink">Roosa</string>
     <string name="theme_name_sand" tools:keep="@string/theme_name_sand">Liivakarva</string>

@@ -179,7 +179,6 @@
     <string name="close_history" tools:keep="@string/close_history">Luk udklipsholderhistorik</string>
     <string name="layout_phone" tools:keep="@string/layout_phone">Telefon</string>
     <string name="layout_phone_symbols" tools:keep="@string/layout_phone_symbols">Telefonsymboler</string>
-    <string name="theme_navbar">Farv navigationslinje</string>
     <string name="load">Indlæs</string>
     <string name="button_save_file">Gem til fil</string>
     <string name="copy_to_clipboard">Kopiér til udklipsholder</string>

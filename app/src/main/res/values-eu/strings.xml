@@ -250,7 +250,6 @@
     <string name="style_name_Rounded" tools:keep="@string/style_name_Rounded">Borobildua</string>
     <string name="theme_colors">Koloreak</string>
     <string name="theme_colors_night">Koloreak (gauekoak)</string>
-    <string name="theme_navbar">Koloretako nabigazio-barra</string>
     <string name="theme_name_holo_white" tools:keep="@string/theme_name_holo_white">Holo Zuria</string>
     <string name="theme_name_dark" tools:keep="@string/theme_name_dark">Iluna</string>
     <string name="theme_name_blue_gray" tools:keep="@string/theme_name_blue_gray">Gris urdina</string>

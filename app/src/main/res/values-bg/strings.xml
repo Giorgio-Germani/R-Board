@@ -276,7 +276,6 @@
     <string name="theme_name_cloudy" tools:keep="@string/theme_name_cloudy">Облачно</string>
     <string name="theme_name_violette" tools:keep="@string/theme_name_violette">Виолетово</string>
     <string name="dialog_close">Затвори</string>
-    <string name="theme_navbar">Цветна лента за навигация</string>
     <string name="auto_user_color">Изберете цвят автоматично</string>
     <string name="main_colors">Показване само на основните цветове</string>
     <string name="all_colors">Покажи всички цветове</string>

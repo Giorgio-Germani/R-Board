@@ -348,7 +348,6 @@
     <string name="key_borders">Klavišų ribos</string>
     <string name="day_night_mode">Auto dienos/nakties režimas</string>
     <string name="day_night_mode_summary">Bus pritaikoma sistemos nustatymai</string>
-    <string name="theme_navbar">Spalvų keitimo juosta</string>
     <string name="theme_name_light" tools:keep="@string/theme_name_light">Šviesi</string>
     <string name="theme_name_holo_white" tools:keep="@string/theme_name_holo_white">Holo balta</string>
     <string name="theme_name_dark" tools:keep="@string/theme_name_dark">Tamsi</string>

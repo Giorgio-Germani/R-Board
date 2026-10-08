@@ -358,7 +358,6 @@
     <string name="style_name_Rounded" tools:keep="@string/style_name_Rounded">گرد</string>
     <string name="theme_colors">رنگ‌ها</string>
     <string name="theme_colors_night">رنگ‌ها (شب)</string>
-    <string name="theme_navbar">رنگی کردن نوار ناوبری (Navigation bar)</string>
     <string name="theme_name_light" tools:keep="@string/theme_name_light">روشن</string>
     <string name="theme_name_holo_white" tools:keep="@string/theme_name_holo_white">سفید هولو</string>
     <string name="theme_name_dark" tools:keep="@string/theme_name_dark">تیره</string>

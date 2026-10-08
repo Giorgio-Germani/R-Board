@@ -331,7 +331,6 @@
     <string name="user_dict_word_already_present">Aquesta paraula ja està present al diccionari de l\'usuari %s. Escriu-ne una altra.</string>
     <string name="user_dict_add_word_button">Afegeix una paraula</string>
     <string name="theme_colors">Colors</string>
-    <string name="theme_navbar">Barra de navegació en color</string>
     <string name="theme_name_holo_white" tools:keep="@string/theme_name_holo_white">Holo Blanc</string>
     <string name="theme_name_dark" tools:keep="@string/theme_name_dark">Fosc</string>
     <string name="theme_name_darker" tools:keep="@string/theme_name_darker">Més fosc</string>

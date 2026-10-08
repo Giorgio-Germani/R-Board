@@ -179,7 +179,6 @@
     <string name="dictionary_link_text">hier</string>
     <string name="dictionary_file_error">Fehler: Ausgewählte Datei ist keine gültige Wörterbuchdatei</string>
     <string name="hidden_features_text">gerätegeschützter Speicher</string>
-    <string name="theme_navbar">Navigationsleiste einfärben</string>
     <string name="theme_name_forest" tools:keep="@string/theme_name_forest">Wald</string>
     <string name="load_gesture_library_message">Du benötigst die Bibliothek für „%s“. Inkompatible Bibliotheken können zu Abstürzen beim Gesten-Tippen führen. \n \nWarnung: Das Laden von externem Code kann ein Sicherheitsrisiko darstellen. Verwende nur Bibliotheken aus Quellen, denen du vertraust.</string>
     <string name="add_dictionary">Wörterbuch zum Hinzufügen auswählen. Wörterbücher im .dict-Format können %s heruntergeladen werden.</string>

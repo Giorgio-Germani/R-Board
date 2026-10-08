@@ -347,7 +347,6 @@
     <string name="switch_keyboard_after">Voltar ao teclado principal após…</string>
     <string name="after_emoji">Selecionar emoji no ecrã de emojis</string>
     <string name="message_add_custom_layout">Selecionar um ficheiro num formato compatível. Infomação sobre os formatos está disponível em %s.</string>
-    <string name="theme_navbar">Cor da barra de navegação</string>
     <string name="select_color_key">Texto da tecla</string>
     <string name="hidden_features_title">Descrição de funções escondidas</string>
     <string name="subtype_dag">Dagbani</string>

@@ -176,7 +176,6 @@
     <string name="dictionary_link_text">tutaj</string>
     <string name="dictionary_file_error">Błąd: wybrany plik nie jest prawidłowym plikiem słownika</string>
     <string name="hidden_features_text">chronionej pamięci urządzenia</string>
-    <string name="theme_navbar">Koloruj pasek nawigacyjny</string>
     <string name="theme_name_forest" tools:keep="@string/theme_name_forest">Leśne</string>
     <string name="load_gesture_library_message">Będziesz potrzebować biblioteki dla \\\'%s\\\'. Niekompatybilne biblioteki mogą powodować awarie podczas pisania gestami.
 \n

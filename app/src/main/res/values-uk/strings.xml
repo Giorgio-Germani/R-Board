@@ -115,7 +115,6 @@
     <string name="enable_clipboard_history">Увімкнути історію буфера обміну</string>
     <string name="enable_clipboard_history_summary">Якщо вимкнено, клавіша буфера обміну вставляє вміст, якщо він є</string>
     <string name="clipboard_history_retention_time">Час зберігання історії</string>
-    <string name="theme_navbar">Колір навігаційної панелі</string>
     <string name="theme_name_light">Світла</string>
     <string name="theme_name_dark">Темна</string>
     <string name="theme_name_darker">Сіра</string>

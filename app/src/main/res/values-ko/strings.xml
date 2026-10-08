@@ -338,7 +338,6 @@
     <string name="style_name_Rounded" tools:keep="@string/style_name_Rounded">둥글게</string>
     <string name="theme_colors">색상</string>
     <string name="theme_colors_night">색상 (밤)</string>
-    <string name="theme_navbar">내비게이션 바에 색상 적용</string>
     <string name="theme_name_light" tools:keep="@string/theme_name_light">밝게</string>
     <string name="theme_name_dark" tools:keep="@string/theme_name_dark">어둡게</string>
     <string name="theme_name_darker" tools:keep="@string/theme_name_darker">더 어둡게</string>

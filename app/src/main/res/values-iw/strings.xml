@@ -309,7 +309,6 @@
     <string name="theme_name_user" tools:keep="@string/theme_name_user">בהגדרת המשתמש</string>
     <string name="theme_name_forest" tools:keep="@string/theme_name_forest">יער</string>
     <string name="theme_colors_night">צבעים (לילה)</string>
-    <string name="theme_navbar">צבע סרגל הניווט</string>
     <string name="theme_name_light" tools:keep="@string/theme_name_light">בהיר</string>
     <string name="theme_name_dynamic" tools:keep="@string/theme_name_dynamic">צבעים חיים</string>
     <string name="theme_name_indigo" tools:keep="@string/theme_name_indigo">אינדיגו</string>

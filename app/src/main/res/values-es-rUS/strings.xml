@@ -250,7 +250,6 @@
     <string name="style_name_Rounded" tools:keep="@string/style_name_Rounded">Redondeado</string>
     <string name="theme_colors">Colores</string>
     <string name="theme_colors_night">Colores (noche)</string>
-    <string name="theme_navbar">Seguir color en la barra de navegación</string>
     <string name="theme_name_light" tools:keep="@string/theme_name_light">Claro</string>
     <string name="theme_name_holo_white" tools:keep="@string/theme_name_holo_white">Claro Holo</string>
     <string name="theme_name_pink" tools:keep="@string/theme_name_pink">Rosa</string>
