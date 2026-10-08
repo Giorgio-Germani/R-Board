@@ -13,6 +13,8 @@ mod sysclip;
 mod tray;
 
 use windows::core::HSTRING;
+use windows::Win32::System::SystemInformation::GetTickCount;
+use windows::Win32::UI::Input::KeyboardAndMouse::{GetLastInputInfo, LASTINPUTINFO};
 use windows::Win32::UI::WindowsAndMessaging::{MessageBoxW, IDYES, MB_ICONINFORMATION, MB_ICONQUESTION, MB_YESNO};
 
 use std::sync::Arc;
@@ -72,6 +74,28 @@ fn main() {
         }
     }
     tray::run_tray();
+}
+
+/// The phone serves one computer at a time. To make switching computers
+/// effortless, the agent releases the phone after this much time without
+/// user input and reconnects as soon as the PC is used again.
+const IDLE_RELEASE_SECS: u32 = 180;
+
+fn user_idle_secs() -> u32 {
+    unsafe {
+        let mut info = LASTINPUTINFO::default();
+        info.cbSize = std::mem::size_of::<LASTINPUTINFO>() as u32;
+        if GetLastInputInfo(&mut info).as_bool() {
+            let now = GetTickCount();
+            if now >= info.dwTime {
+                (now - info.dwTime) / 1000
+            } else {
+                0 // tick counter wrapped
+            }
+        } else {
+            0
+        }
+    }
 }
 
 /// on the very first start, ask whether the agent should launch with Windows;
@@ -175,6 +199,11 @@ fn sync_loop(address: u64, own_id: [u8; 16]) {
     let mut backoff = Duration::from_secs(1);
     loop {
         CONNECTED.store(false, std::sync::atomic::Ordering::SeqCst);
+        if user_idle_secs() > IDLE_RELEASE_SECS {
+            // PC not in use — leave the phone free for the computer the user is working at
+            thread::sleep(Duration::from_secs(2));
+            continue;
+        }
         match rcomm::Connection::connect(address) {
             Ok(conn) => {
                 logln("connected");
@@ -238,6 +267,11 @@ fn run_session(conn: Arc<rcomm::Connection>, own_id: [u8; 16]) -> Result<(), Box
         loop {
             if dead.load(Ordering::SeqCst) {
                 return Err("phone disconnected".into());
+            }
+            if user_idle_secs() > IDLE_RELEASE_SECS {
+                // PC not in use — release the phone for the computer the user switched to
+                logln("releasing phone (PC idle)");
+                return Ok(());
             }
             if let Some(seq) = sysclip::seq() {
                 if last_seq != Some(seq) {
