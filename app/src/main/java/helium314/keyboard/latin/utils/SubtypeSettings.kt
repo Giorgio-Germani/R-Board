@@ -33,7 +33,9 @@ object SubtypeSettings {
         else enabled + SettingsSubtype.fallbackSubtype.toAdditionalSubtype()
     }
 
-    fun isEnabled(subtype: InputMethodSubtype?): Boolean = subtype in enabledSubtypes || subtype in getDefaultEnabledSubtypes()
+    // deliberately no fallback to the system default subtypes: the setup wizard materializes
+    // them into the prefs, and a hardcoded "always enabled" system locale could never be disabled
+    fun isEnabled(subtype: InputMethodSubtype?): Boolean = subtype in enabledSubtypes
 
     fun getAllAvailableSubtypes(): List<InputMethodSubtype> =
         resourceSubtypesByLocale.values.flatten() + additionalSubtypes
