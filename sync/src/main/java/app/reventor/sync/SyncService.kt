@@ -132,7 +132,7 @@ class SyncService : Service() {
 
     private suspend fun acceptLoop(): Unit = coroutineScope {
         SyncState.statusLine = "Waiting for desktop…"
-        var busy = false
+        var active = 0
         while (isActive) {
             val adapter = btAdapter
             if (adapter == null || !adapter.isEnabled) {
@@ -157,19 +157,18 @@ class SyncService : Service() {
                 continue
             }
             // keep the listening socket open: the SDP record must stay advertised
-            // while a client is being served, otherwise a second computer cannot
+            // while clients are being served, otherwise a new computer cannot
             // even discover the phone
-            if (busy) {
-                // one session at a time — reject instead of silently stealing
-                try { socket.close() } catch (_: IOException) {}
-                continue
-            }
-            busy = true
             launch {
                 try {
+                    active++
                     serve(socket)
                 } finally {
-                    busy = false
+                    active--
+                    if (active == 0) {
+                        SyncState.connectedPeer = null
+                        SyncState.statusLine = "Waiting for desktop…"
+                    }
                 }
             }
         }
