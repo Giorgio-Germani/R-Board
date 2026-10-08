@@ -1457,7 +1457,7 @@ dependencies = [
 
 [[package]]
 name = "protocol"
-version = "0.1.0"
+version = "1.1.2"
 dependencies = [
  "sha2",
 ]
@@ -1498,7 +1498,7 @@ dependencies = [
 
 [[package]]
 name = "reventor-agent"
-version = "0.1.0"
+version = "1.1.2"
 dependencies = [
  "clipboard-win",
  "protocol",

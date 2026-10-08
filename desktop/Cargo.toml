@@ -4,7 +4,7 @@ members = ["protocol", "agent"]
 
 [workspace.package]
 edition = "2021"
-version = "0.1.0"
+version = "1.1.2"
 
 [profile.release]
 opt-level = "z"
