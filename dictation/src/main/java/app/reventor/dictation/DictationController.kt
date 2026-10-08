@@ -75,32 +75,41 @@ class DictationController(private val ime: InputMethodService) {
 
     private fun showOverlay() {
         main.post {
-        val existing = overlay
-        if (existing != null) {
-            Log.d(TAG, "overlay: reusing existing view")
-            existing.visibility = View.VISIBLE
-            return@post
-        }
-        val content = ime.window?.findViewById(android.R.id.content) as? android.view.ViewGroup
-        if (content == null) {
-            Log.w(TAG, "overlay: no window/content — retrying")
-            main.postDelayed({ showOverlay() }, 100)
-            return@post
-        }
-        val kbId = ime.resources.getIdentifier("keyboard_view", "id", ime.packageName)
-        val kbView = if (kbId != 0) content.findViewById<View>(kbId) else null
-        val kbParent = kbView?.parent as? android.view.ViewGroup
-        if (kbView == null || kbParent == null || kbView.width == 0 || kbView.height == 0) {
-            // keyboard not laid out yet — retry shortly
-            Log.w(TAG, "overlay: keyboard view not ready (kbId=$kbId view=${kbView != null}, parent=${kbParent != null}, size=${kbView?.width}x${kbView?.height}) — retrying")
-            main.postDelayed({ showOverlay() }, 100)
-            return@post
-        }
-        Log.d(TAG, "overlay anchored to keyboard view ${kbView.width}x${kbView.height}, letter area $letterAreaHeight")
-        val ov = RecordingOverlay(ime, themeBackground, themeCircle, kbView.width, kbView.height, letterAreaHeight)
-        kbParent.addView(ov, kbParent.indexOfChild(kbView) + 1, android.widget.FrameLayout.LayoutParams(kbView.width, kbView.height))
-        overlay = ov
-        ov.visibility = View.VISIBLE
+            val content = ime.window?.findViewById(android.R.id.content) as? android.view.ViewGroup
+            val kbId = ime.resources.getIdentifier("keyboard_view", "id", ime.packageName)
+            val kbView = if (content != null && kbId != 0) content.findViewById<View>(kbId) else null
+            val kbParent = kbView?.parent as? android.view.ViewGroup
+            val existing = overlay
+            if (existing != null) {
+                val attached = existing.parent === kbParent && kbView != null &&
+                        kbView.width == existing.width && kbView.height == existing.height
+                if (attached) {
+                    Log.d(TAG, "overlay: reusing existing view")
+                    existing.visibility = View.VISIBLE
+                    return@post
+                }
+                // keyboard view was recreated (layout/theme switch) — the old overlay
+                // is anchored to a dead parent, drop it and re-anchor fresh
+                Log.d(TAG, "overlay: stale anchor (parent ok=${existing.parent === kbParent}, kb=${kbView?.width}x${kbView?.height}) — re-anchoring")
+                (existing.parent as? android.view.ViewGroup)?.removeView(existing)
+                overlay = null
+            }
+            if (content == null) {
+                Log.w(TAG, "overlay: no window/content — retrying")
+                main.postDelayed({ showOverlay() }, 100)
+                return@post
+            }
+            if (kbView == null || kbParent == null || kbView.width == 0 || kbView.height == 0) {
+                // keyboard not laid out yet — retry shortly
+                Log.w(TAG, "overlay: keyboard view not ready (kbId=$kbId view=${kbView != null}, parent=${kbParent != null}, size=${kbView?.width}x${kbView?.height}) — retrying")
+                main.postDelayed({ showOverlay() }, 100)
+                return@post
+            }
+            Log.d(TAG, "overlay anchored to keyboard view ${kbView.width}x${kbView.height}, letter area $letterAreaHeight")
+            val ov = RecordingOverlay(ime, themeBackground, themeCircle, kbView.width, kbView.height, letterAreaHeight)
+            kbParent.addView(ov, kbParent.indexOfChild(kbView) + 1, android.widget.FrameLayout.LayoutParams(kbView.width, kbView.height))
+            overlay = ov
+            ov.visibility = View.VISIBLE
         }
     }
 
