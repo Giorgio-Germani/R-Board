@@ -8,6 +8,7 @@ package helium314.keyboard.latin.utils;
 
 import android.annotation.SuppressLint;
 import android.app.Application;
+import android.content.Context;
 import android.os.Build;
 import android.text.TextUtils;
 
@@ -112,6 +113,25 @@ public final class JniUtils {
 
     private JniUtils() {
         // This utility class is not publicly instantiable.
+    }
+
+    /** Tries to load the user-supplied gesture library at any time, e.g. right after downloading it.
+     *  Avoids the process restart otherwise needed for the static initializer to pick it up. */
+    public static void loadGestureLib(final Context context) {
+        if (sHaveGestureLib || BuildConfig.BUILD_TYPE.equals("nouserlib"))
+            return;
+        final File userSuppliedLibrary = new File(context.getFilesDir(), JNI_LIB_IMPORT_FILE_NAME);
+        if (!userSuppliedLibrary.isFile())
+            return;
+        try {
+            final String wantedChecksum = KtxKt.protectedPrefs(context).getString(Settings.PREF_LIBRARY_CHECKSUM, expectedDefaultChecksum());
+            if (TextUtils.equals(wantedChecksum, ChecksumCalculator.INSTANCE.checksum(userSuppliedLibrary))) {
+                System.load(userSuppliedLibrary.getAbsolutePath());
+                sHaveGestureLib = true;
+            }
+        } catch (Throwable t) {
+            Log.w(TAG, "Could not load user-supplied library", t);
+        }
     }
 
     public static void loadNativeLibrary() {

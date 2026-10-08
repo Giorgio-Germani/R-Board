@@ -50,7 +50,7 @@ fun GestureTypingScreen(
             showLibDialog = true
     }
     if (showLibDialog)
-        GestureLibDownloadDialog(onDeclined = { showLibDialog = false })
+        GestureLibDownloadDialog(onDeclined = { showLibDialog = false }, onInstalled = { showLibDialog = false })
     val items = listOf(
         Settings.PREF_GESTURE_INPUT,
         if (gestureEnabled)

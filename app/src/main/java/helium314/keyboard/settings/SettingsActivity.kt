@@ -134,7 +134,7 @@ open class SettingsActivity : ComponentActivity(), SharedPreferences.OnSharedPre
                                 showGestureLibPrompt = false
                                 // declining swiping disables it, so the prompt will not come back
                                 prefs.edit { putBoolean(Settings.PREF_GESTURE_INPUT, false) }
-                            })
+                            }, onInstalled = { showGestureLibPrompt = false })
                         } else if (crashReports.isNotEmpty()) {
                             val ctx = LocalContext.current
                             ConfirmationDialog(

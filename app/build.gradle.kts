@@ -13,8 +13,8 @@ android {
         applicationId = "app.reventor.keyboard"
         minSdk = 21
         targetSdk = 37
-        versionCode = 10102
-        versionName = "1.1.2"
+        versionCode = 10103
+        versionName = "1.1.3"
         ndk {
             abiFilters.clear()
             abiFilters.addAll(listOf("armeabi-v7a", "arm64-v8a", "x86", "x86_64"))

@@ -17,6 +17,7 @@ import helium314.keyboard.latin.settings.Settings
 import helium314.keyboard.latin.utils.ChecksumCalculator
 import helium314.keyboard.latin.utils.JniUtils
 import helium314.keyboard.latin.utils.Log
+import helium314.keyboard.latin.utils.prefs
 import helium314.keyboard.latin.utils.protectedPrefs
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -37,6 +38,7 @@ private const val LIB_URL_BASE =
 @Composable
 fun GestureLibDownloadDialog(
     onDeclined: () -> Unit,
+    onInstalled: () -> Unit,
 ) {
     var state by rememberSaveable { mutableStateOf(DownloadState.ASK) }
     when (state) {
@@ -73,21 +75,22 @@ fun GestureLibDownloadDialog(
         val ctx = androidx.compose.ui.platform.LocalContext.current
         LaunchedEffect(Unit) {
             val success = withContext(Dispatchers.IO) { downloadAndInstallGestureLib(ctx) }
-            if (!success) state = DownloadState.ERROR
-            // on success the app exits and restarts inside downloadAndInstallGestureLib
+            if (!success) state = DownloadState.ERROR else onInstalled()
         }
     }
 }
 
 private enum class DownloadState { ASK, DOWNLOADING, ERROR }
 
-/** Returns true if the library was installed (app is about to restart), false on any failure. */
+/** Downloads, verifies and loads the library. Returns true when swiping is ready (no restart needed). */
 private fun downloadAndInstallGestureLib(context: Context): Boolean {
     val filesDir = context.filesDir
     val tmpFile = File(filesDir, "tmplib_download")
     try {
         val abi = Build.SUPPORTED_ABIS[0]
         val connection = URL("$LIB_URL_BASE/$abi/libjni_latinimegoogle.so").openConnection() as HttpURLConnection
+        connection.connectTimeout = 10_000
+        connection.readTimeout = 30_000
         connection.connect()
         if (connection.responseCode != HttpURLConnection.HTTP_OK) throw IOException("HTTP ${connection.responseCode}")
         connection.inputStream.use { input ->
@@ -103,8 +106,12 @@ private fun downloadAndInstallGestureLib(context: Context): Boolean {
         tmpFile.copyTo(libFile, overwrite = true)
         tmpFile.delete()
         libFile.setReadOnly()
-        Runtime.getRuntime().exit(0) // restart so the library is loaded on next start
-        return true // unreachable
+        // load immediately: no process restart, so the keyboard stays active
+        JniUtils.loadGestureLib(context)
+        if (!JniUtils.sHaveGestureLib) throw IOException("library loaded but flag not set")
+        // make sure swiping is on so it works without any manual step
+        context.prefs().edit { putBoolean(Settings.PREF_GESTURE_INPUT, true) }
+        return true
     } catch (e: Exception) {
         Log.w("GestureLibDownload", "gesture library download failed", e)
         tmpFile.delete()
