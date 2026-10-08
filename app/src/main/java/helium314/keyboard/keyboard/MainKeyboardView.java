@@ -749,25 +749,16 @@ public final class MainKeyboardView extends KeyboardView implements DrawingProxy
         // avoid showing same language twice
         final List<Locale> secondaryLocalesToUse = withoutDuplicateLanguages(secondaryLocales, subtype.getLocale().getLanguage());
         if (!secondaryLocalesToUse.isEmpty()) {
-            StringBuilder sb = new StringBuilder(subtype.getMiddleDisplayName());
             final Locale displayLocale = ConfigurationCompatKt.locale(getResources().getConfiguration());
-            for (Locale locale : secondaryLocales) {
-                sb.append(" - ");
-                sb.append(locale.getDisplayLanguage(displayLocale));
-            }
-            final String full = sb.toString();
-            if (fitsTextIntoWidth(width, full, paint)) {
-                return full;
-            }
-            sb.setLength(0);
-            sb.append(subtype.getLocale().getLanguage().toUpperCase(displayLocale));
-            for (Locale locale : secondaryLocales) {
-                sb.append(" - ");
+            // short language codes with slash separators, e.g. "DE / EN"
+            StringBuilder sb = new StringBuilder(subtype.getLocale().getLanguage().toUpperCase(displayLocale));
+            for (Locale locale : secondaryLocalesToUse) {
+                sb.append(" / ");
                 sb.append(locale.getLanguage().toUpperCase(displayLocale));
             }
-            final String middle = sb.toString();
-            if (fitsTextIntoWidth(width, middle, paint)) {
-                return middle;
+            final String codeList = sb.toString();
+            if (fitsTextIntoWidth(width, codeList, paint)) {
+                return codeList;
             }
         }
 
@@ -816,12 +807,9 @@ public final class MainKeyboardView extends KeyboardView implements DrawingProxy
         final String spaceText;
         if (!customText.isEmpty()) {
             spaceText = customText;
-        } else if (DebugFlags.DEBUG_ENABLED) {
-            final String l = KeyboardSwitcher.getInstance().getLocaleAndConfidenceInfo();
-            spaceText = l != null ? l : layoutLanguageOnSpacebar(paint, keyboard.mId.getSubtype(), width);
-        }
-        else
+        } else {
             spaceText = layoutLanguageOnSpacebar(paint, keyboard.mId.getSubtype(), width);
+        }
         paint.setTypeface(KeyboardTypeface.resolve(spaceText, Typeface.DEFAULT));
         // Draw language text with shadow
         final float descent = paint.descent();
