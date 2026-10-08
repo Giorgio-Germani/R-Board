@@ -33,6 +33,7 @@ class DictationController(private val ime: InputMethodService) {
         private const val SAMPLE_RATE = 16_000
         private const val MAX_SAMPLES = SAMPLE_RATE * 30
         private const val VOICE_RMS_THRESHOLD = 0.01f // above typical room noise, below speech
+        private const val TAP_MAX_DURATION = 350L // presses shorter than this keep recording after release
 
         /** Language codes the dictation engine can recognize (whistle model). */
         @JvmField
@@ -67,6 +68,9 @@ class DictationController(private val ime: InputMethodService) {
 
     @Volatile
     private var pendingRelease = false
+
+    @Volatile
+    private var pressStartedAt = 0L
 
     @Volatile
     private var sessionActive = false
@@ -134,14 +138,15 @@ class DictationController(private val ime: InputMethodService) {
         main.post { overlay?.visibility = View.INVISIBLE }
     }
 
-    /** Key-down on the layout voice key: start push-to-talk. */
+    /** Key-down on the layout voice key: start recording (tap) or push-to-talk (hold). */
     fun onPressStart() {
         Log.d(TAG, "onPressStart: engine available=${NeedleEngine.available()}")
         gestureHandled = false
         pendingRelease = false
         if (!NeedleEngine.available()) return // no native lib (wrong ABI) → legacy voice IME
         gestureHandled = true
-        lastGestureAt = android.os.SystemClock.uptimeMillis()
+        pressStartedAt = android.os.SystemClock.uptimeMillis()
+        lastGestureAt = pressStartedAt
         if (!hasMicPermission()) {
             launchPermissionActivity()
             return
@@ -149,12 +154,21 @@ class DictationController(private val ime: InputMethodService) {
         executor.execute { prepareAndStartRecording() }
     }
 
-    /** Key-up on the layout voice key: stop and transcribe. */
+    /**
+     * Key-up on the layout voice key. A quick tap keeps recording — silence
+     * auto-stop (or a second tap) finalizes. A long press is push-to-talk:
+     * releasing stops and transcribes.
+     */
     fun onPressEnd() {
         Log.d(TAG, "onPressEnd: gestureHandled=$gestureHandled sessionActive=$sessionActive")
         if (!gestureHandled) return
         gestureHandled = false
         lastGestureAt = android.os.SystemClock.uptimeMillis()
+        val quickTap = android.os.SystemClock.uptimeMillis() - pressStartedAt < TAP_MAX_DURATION
+        if (quickTap) {
+            pendingRelease = false
+            return
+        }
         pendingRelease = true
         if (sessionActive) finalizeOnExecutor()
     }
