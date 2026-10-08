@@ -742,7 +742,9 @@ public final class KeyboardSwitcher {
             keyboardView.setKeyboard(newKeyboard);
             mCurrentInputView.setKeyboardTopPadding(newKeyboard.mTopPadding);
             keyboardView.setKeyPreviewPopupEnabled(currentSettingsValues.mKeyPreviewPopupOn);
-            keyboardView.updateShortcutKey(mRichImm.isShortcutImeReady());
+            // R-Board's mic key runs its own offline dictation and must not depend on
+            // the legacy system voice IME being "ready" (flaky on MIUI, disables the key)
+            keyboardView.updateShortcutKey(true);
             boolean subtypeChanged = (oldKeyboard == null) || !newKeyboard.mId.getSubtype().equals(oldKeyboard.mId.getSubtype());
             int languageOnSpacebarFormatType = LanguageOnSpacebarUtils.getLanguageOnSpacebarFormatType(newKeyboard.mId.getSubtype());
             boolean hasMultipleEnabledIMEsOrSubtypes = mRichImm.hasMultipleEnabledIMEsOrSubtypes(true);
