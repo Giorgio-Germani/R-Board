@@ -4,6 +4,7 @@ package helium314.keyboard.settings.dialogs
 import android.content.Context
 import android.os.Build
 import androidx.compose.material3.Text
+import androidx.compose.ui.window.DialogProperties
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -15,6 +16,7 @@ import helium314.keyboard.latin.R
 import helium314.keyboard.latin.settings.Settings
 import helium314.keyboard.latin.utils.ChecksumCalculator
 import helium314.keyboard.latin.utils.JniUtils
+import helium314.keyboard.latin.utils.Log
 import helium314.keyboard.latin.utils.protectedPrefs
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -38,8 +40,13 @@ fun GestureLibDownloadDialog(
 ) {
     var state by rememberSaveable { mutableStateOf(DownloadState.ASK) }
     when (state) {
-        DownloadState.ASK -> ConfirmationDialog(
-            onDismissRequest = onDeclined, // cancel or outside tap both count as "no"
+        DownloadState.ASK -> ThreeButtonAlertDialog(
+            // no dismiss on outside tap / back: only the explicit "No" button declines,
+            // otherwise an accidental tap would silently disable swiping
+            properties = DialogProperties(dismissOnBackPress = false, dismissOnClickOutside = false),
+            // confirm runs onConfirmed() and then onDismissRequest(); only treat the
+            // dismiss as a decline if confirmation did not already move us on
+            onDismissRequest = { if (state == DownloadState.ASK) onDeclined() },
             onConfirmed = { state = DownloadState.DOWNLOADING },
             title = { Text(stringResource(R.string.gesture_lib_auto_prompt_title)) },
             content = { Text(stringResource(R.string.gesture_lib_auto_prompt_message)) },
@@ -99,6 +106,7 @@ private fun downloadAndInstallGestureLib(context: Context): Boolean {
         Runtime.getRuntime().exit(0) // restart so the library is loaded on next start
         return true // unreachable
     } catch (e: Exception) {
+        Log.w("GestureLibDownload", "gesture library download failed", e)
         tmpFile.delete()
         return false
     }

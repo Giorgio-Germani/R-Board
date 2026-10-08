@@ -4,11 +4,17 @@ package helium314.keyboard.settings.screens
 import android.content.Context
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import helium314.keyboard.keyboard.KeyboardSwitcher
+import helium314.keyboard.latin.BuildConfig
 import helium314.keyboard.latin.R
 import helium314.keyboard.latin.settings.Defaults
 import helium314.keyboard.latin.settings.Settings
@@ -19,6 +25,7 @@ import helium314.keyboard.latin.utils.prefs
 import helium314.keyboard.settings.Setting
 import helium314.keyboard.settings.SearchSettingsScreen
 import helium314.keyboard.settings.SettingsActivity
+import helium314.keyboard.settings.dialogs.GestureLibDownloadDialog
 import helium314.keyboard.settings.preferences.SliderPreference
 import helium314.keyboard.settings.preferences.SwitchPreference
 import helium314.keyboard.latin.utils.Theme
@@ -36,6 +43,14 @@ fun GestureTypingScreen(
         Log.v("irrelevant", "stupid way to trigger recomposition on preference change")
     val gestureFloatingPreviewEnabled = prefs.getBoolean(Settings.PREF_GESTURE_FLOATING_PREVIEW_TEXT, Defaults.PREF_GESTURE_FLOATING_PREVIEW_TEXT)
     val gestureEnabled = prefs.getBoolean(Settings.PREF_GESTURE_INPUT, Defaults.PREF_GESTURE_INPUT)
+    // without the library, offer the download every time this screen is opened
+    var showLibDialog by rememberSaveable { mutableStateOf(false) }
+    LaunchedEffect(Unit) {
+        if (!JniUtils.sHaveGestureLib && !BuildConfig.BUILD_TYPE.equals("nouserlib"))
+            showLibDialog = true
+    }
+    if (showLibDialog)
+        GestureLibDownloadDialog(onDeclined = { showLibDialog = false })
     val items = listOf(
         Settings.PREF_GESTURE_INPUT,
         if (gestureEnabled)
