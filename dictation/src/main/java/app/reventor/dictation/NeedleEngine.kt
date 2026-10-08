@@ -47,6 +47,23 @@ object NeedleEngine {
         }
     }
 
+    /**
+     * Transcribes with auto-detect and returns (text, detectedLanguageCode).
+     * detectedLanguageCode is null when the engine did not report a language.
+     */
+    fun transcribeAutoDetect(pcm: FloatArray): Pair<String, String?> = synchronized(lock) {
+        if (!modelLoaded) return "" to null
+        try {
+            NeedleNative.nativeTranscribe(pcm, null, null)?.let { json ->
+                val obj = JSONObject(json)
+                obj.optString("text", "") to obj.optString("language", "").ifEmpty { null }
+            } ?: ("" to null)
+        } catch (t: Throwable) {
+            Log.w(TAG, "transcribe failed", t)
+            "" to null
+        }
+    }
+
     /** Streams a chunk (~1 s); returns the words newly committed by this call. */
     fun streamProcess(pcm: FloatArray, language: String?, keywords: String?): String = synchronized(lock) {
         if (!modelLoaded) return ""

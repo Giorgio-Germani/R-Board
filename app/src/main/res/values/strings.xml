@@ -200,6 +200,10 @@
     <string name="gesture_lib_auto_retry">Retry</string>
     <!-- Hint shown in the main settings when the glide typing library is not installed. -->
     <string name="gesture_lib_missing_hint">Swiping component not installed yet — tap to set it up</string>
+    <!-- Setting to limit dictation to the keyboard's active languages. -->
+    <string name="dictation_restrict_languages">Dictation: active keyboard languages only</string>
+    <!-- Summary for the dictation language restriction. -->
+    <string name="dictation_restrict_languages_summary">Speech is recognized in the languages of your enabled keyboard layouts (e.g. German and English). Other languages are ignored. When off, the engine detects any language it knows.</string>
     <!-- Option to enable gesture trail preview. The user can see a trail of the gesture during gesture input.-->
     <string name="gesture_preview_trail">Show gesture trail</string>
     <!-- Option to enable gesture floating text preview. The user can see a suggested word floating above the keyboard during a gesture input.-->

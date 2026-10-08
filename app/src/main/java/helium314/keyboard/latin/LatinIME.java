@@ -41,6 +41,8 @@ import helium314.keyboard.compat.ImeCompat;
 import helium314.keyboard.event.HapticEvent;
 import android.inputmethodservice.InputMethodService;
 import app.reventor.dictation.DictationController;
+import helium314.keyboard.latin.settings.Defaults;
+import helium314.keyboard.latin.utils.DeviceProtectedUtils;
 import app.reventor.sync.SyncAutoStart;
 import helium314.keyboard.keyboard.Key;
 import helium314.keyboard.keyboard.KeyboardActionListener;
@@ -1440,6 +1442,17 @@ public class LatinIME extends InputMethodService implements
                 colors.get(ColorType.MAIN_BACKGROUND),
                 colors.get(ColorType.KEY_TEXT), // the waveform uses the letter color
                 letterAreaHeight);
+        // dictation only speaks the keyboard's active languages — everything else is ignored
+        final java.util.HashSet<String> languages = new java.util.HashSet<>();
+        if (DeviceProtectedUtils.getSharedPreferences(this)
+                .getBoolean(Settings.PREF_DICTATION_RESTRICT_LANGUAGES, Defaults.PREF_DICTATION_RESTRICT_LANGUAGES)) {
+            for (final InputMethodSubtype subtype : SubtypeSettings.INSTANCE.getEnabledSubtypes(true)) {
+                final String code = subtype.getLocale().toLowerCase(java.util.Locale.ROOT).split("_")[0];
+                if (DictationController.SUPPORTED_LANGUAGES.contains(code))
+                    languages.add(code);
+            }
+        }
+        getDictation().setAllowedLanguages(languages);
     }
 
     public void onEvent(@NonNull final Event event) {

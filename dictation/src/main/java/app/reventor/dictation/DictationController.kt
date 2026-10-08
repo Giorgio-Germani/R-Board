@@ -32,6 +32,10 @@ class DictationController(private val ime: InputMethodService) {
         private const val TAG = "ReventorDictation"
         private const val SAMPLE_RATE = 16_000
         private const val MAX_SAMPLES = SAMPLE_RATE * 30
+
+        /** Language codes the dictation engine can recognize (whistle model). */
+        @JvmField
+        val SUPPORTED_LANGUAGES = setOf("en", "de", "fr", "es", "it", "nl")
     }
 
     private val main = Handler(Looper.getMainLooper())
@@ -72,6 +76,18 @@ class DictationController(private val ime: InputMethodService) {
         themeCircle = circle
         letterAreaHeight = letterArea
     }
+
+    /**
+     * Restricts recognition to the given language codes (the keyboard's active languages).
+     * The engine auto-detects; an utterance it hears as an unsupported language gets one
+     * re-decode with the keyboard language. Empty set = unrestricted auto-detect.
+     */
+    fun setAllowedLanguages(codes: Set<String>) {
+        allowedLanguages = codes
+    }
+
+    @Volatile
+    private var allowedLanguages: Set<String> = emptySet()
 
     private fun showOverlay() {
         main.post {
@@ -254,10 +270,22 @@ class DictationController(private val ime: InputMethodService) {
         hideOverlay()
         executor.execute {
             val pcm = stopRecorder() ?: return@execute
-            val language = currentLanguage()
-            // batch mode: one transcription of the whole clip — full utterance
-            // context gives the best recognition quality
-            var text = NeedleEngine.transcribe(pcm, language, null).trim()
+            val keyboardLanguage = currentLanguage()
+            // restricted mode: the engine picks between the keyboard's active languages;
+            // anything else it thinks it heard is ignored and re-decoded with the keyboard language
+            var text = if (allowedLanguages.isNotEmpty()) {
+                val (autoText, detected) = NeedleEngine.transcribeAutoDetect(pcm)
+                when {
+                    autoText.isEmpty() -> ""
+                    detected in allowedLanguages -> autoText.trim()
+                    else -> {
+                        Log.d(TAG, "detected language $detected, not in $allowedLanguages — re-decoding with keyboard language $keyboardLanguage")
+                        NeedleEngine.transcribe(pcm, keyboardLanguage ?: allowedLanguages.first(), null).trim()
+                    }
+                }
+            } else {
+                NeedleEngine.transcribe(pcm, keyboardLanguage, null).trim()
+            }
             if (text.isEmpty()) {
                 main.post { toast("Nothing heard") }
                 return@execute
