@@ -181,4 +181,25 @@ object SubtypeUtilsAdditional {
         extraValueItems.add(ExtraValue.IS_ADDITIONAL_SUBTYPE)
         return extraValueItems.joinToString(",")
     }
+
+    /**
+     * Runs once: enables multilingual typing between all enabled latin-script languages,
+     * so the keyboard suggests and autocorrects in all of them at the same time.
+     * Skipped when any subtype already has secondary locales configured.
+     */
+    fun ensureDefaultMultilingualTyping(context: Context) {
+        val prefs = context.prefs()
+        if (prefs.getBoolean(Settings.PREF_MULTILINGUAL_AUTO_APPLIED, false)) return
+        prefs.edit { putBoolean(Settings.PREF_MULTILINGUAL_AUTO_APPLIED, true) }
+        val latinSubtypes = SubtypeSettings.getEnabledSubtypes(true)
+            .filter { it.locale().script() == ScriptUtils.SCRIPT_LATIN }
+        if (latinSubtypes.size < 2) return
+        if (latinSubtypes.any { it.toSettingsSubtype().getExtraValueOf(ExtraValue.SECONDARY_LOCALES) != null }) return
+        val languages = latinSubtypes.map { it.locale().language }
+        latinSubtypes.forEach { subtype ->
+            val others = languages.filter { it != subtype.locale().language }.joinToString(Separators.KV)
+            val target = subtype.toSettingsSubtype().with(ExtraValue.SECONDARY_LOCALES, others)
+            changeAdditionalSubtype(subtype.toSettingsSubtype(), target, context)
+        }
+    }
 }

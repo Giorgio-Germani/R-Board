@@ -131,6 +131,7 @@ public final class Settings implements SharedPreferences.OnSharedPreferenceChang
     public static final String PREF_SUGGEST_CLIPBOARD_CONTENT = "suggest_clipboard_content";
     public static final String PREF_GESTURE_INPUT = "gesture_input";
     public static final String PREF_DICTATION_RESTRICT_LANGUAGES = "dictation_restrict_languages";
+    public static final String PREF_MULTILINGUAL_AUTO_APPLIED = "multilingual_auto_applied";
     public static final String PREF_VIBRATION_DURATION_SETTINGS = "vibration_duration_settings";
     public static final String PREF_KEYPRESS_SOUND_VOLUME = "keypress_sound_volume";
     public static final String PREF_KEY_LONGPRESS_TIMEOUT = "key_longpress_timeout";

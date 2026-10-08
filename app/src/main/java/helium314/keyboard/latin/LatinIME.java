@@ -43,6 +43,7 @@ import android.inputmethodservice.InputMethodService;
 import app.reventor.dictation.DictationController;
 import helium314.keyboard.latin.settings.Defaults;
 import helium314.keyboard.latin.utils.DeviceProtectedUtils;
+import helium314.keyboard.latin.utils.SubtypeUtilsAdditional;
 import app.reventor.sync.SyncAutoStart;
 import helium314.keyboard.keyboard.Key;
 import helium314.keyboard.keyboard.KeyboardActionListener;
@@ -565,6 +566,8 @@ public class LatinIME extends InputMethodService implements
         super.onCreate();
 
         loadSettings();
+        // enable multilingual typing (e.g. German + English) once, so both languages work at the same time
+        SubtypeUtilsAdditional.INSTANCE.ensureDefaultMultilingualTyping(this);
         // keep the Bluetooth clipboard sync alive whenever the keyboard is used;
         // it keeps running after the keyboard is closed
         SyncAutoStart.onKeyboardStart(this);
