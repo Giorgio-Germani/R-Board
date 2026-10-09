@@ -7,18 +7,15 @@ import android.os.SystemClock
 import android.view.View
 
 /**
- * Overlay covering ONLY the letter rows of the keyboard: while recording, the
- * letters disappear and a waveform line scrolls continuously right-to-left,
- * drawing the live microphone amplitude like an oscilloscope. The suggestion
- * strip above and the bottom row (spacebar / mic / enter) below stay visible.
+ * Recording waveform inside the suggestion strip: while recording, this view
+ * covers the middle of the bar (where the word suggestions normally appear)
+ * and draws the live microphone amplitude as a continuous right-to-left
+ * flowing waveform line, like a voice message.
  */
-class RecordingOverlay(
+class WaveformBarView(
     context: Context,
     private val backgroundColor: Int,
     lineColor: Int,
-    private val fixedWidth: Int,
-    private val fixedHeight: Int,
-    private val letterAreaHeight: Int,
 ) : View(context) {
 
     private val bgPaint = Paint().apply { color = backgroundColor }
@@ -27,7 +24,8 @@ class RecordingOverlay(
         style = Paint.Style.STROKE
         strokeCap = Paint.Cap.ROUND
         strokeJoin = Paint.Join.ROUND
-        strokeWidth = 4f * resources.displayMetrics.density
+        // stroke width is set per-draw: the bar is narrow, so a fixed dp width
+        // would make the 72 overlapping bars fuse into a solid ribbon
     }
 
     /** amplitude history; head = newest sample */
@@ -45,19 +43,17 @@ class RecordingOverlay(
         postInvalidateOnAnimation()
     }
 
-    override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
-        setMeasuredDimension(fixedWidth, fixedHeight)
-    }
-
     override fun onDraw(canvas: Canvas) {
-        val w = fixedWidth.toFloat()
-        val area = letterAreaHeight.coerceAtLeast(1).toFloat()
-        val center = area / 2f
-        val halfAmp = area * 0.42f
-        canvas.drawRect(0f, 0f, w, area, bgPaint)
+        canvas.drawPaint(bgPaint)
+        val w = width.toFloat()
+        val h = height.toFloat()
+        if (w <= 0 || h <= 0) return
+        val center = h / 2f
+        val halfAmp = h * 0.38f
         if (!hasSample) return
 
         val step = w / (samples.size - 1)
+        linePaint.strokeWidth = (step * 0.55f).coerceIn(2f, 4f * resources.displayMetrics.density)
         // the newest sample keeps moving left between arrivals -> continuous flow
         val sinceSample = (SystemClock.uptimeMillis() - lastSampleUptime)
             .coerceIn(0L, SAMPLE_INTERVAL_MS)

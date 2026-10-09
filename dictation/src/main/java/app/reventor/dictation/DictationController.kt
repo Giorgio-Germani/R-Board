@@ -49,11 +49,10 @@ class DictationController(private val ime: InputMethodService) {
     private val chunks = ArrayList<FloatArray>()
     private var totalSamples = 0
 
-    // recording overlay (replaces the keys with a volume-reactive circle)
-    private var overlay: RecordingOverlay? = null
+    // recording waveform inside the suggestion strip (covers the suggestions area)
+    private var waveform: WaveformBarView? = null
     @Volatile private var themeBackground = 0xFF16191E.toInt()
-    @Volatile private var themeCircle = 0xFF3D5AFE.toInt()
-    @Volatile private var letterAreaHeight = 0
+    @Volatile private var themeLine = 0xFF3D5AFE.toInt()
 
     // gesture bookkeeping between press / release / tap events
     @Volatile
@@ -70,11 +69,10 @@ class DictationController(private val ime: InputMethodService) {
     @Volatile
     private var sessionActive = false
 
-    /** Theme colors + the pixel height of the letter rows for the recording overlay. */
-    fun setColors(background: Int, circle: Int, letterArea: Int) {
+    /** Theme colors for the recording waveform (line color over the strip background). */
+    fun setColors(line: Int, background: Int) {
+        themeLine = line
         themeBackground = background
-        themeCircle = circle
-        letterAreaHeight = letterArea
     }
 
     /**
@@ -89,48 +87,47 @@ class DictationController(private val ime: InputMethodService) {
     @Volatile
     private var allowedLanguages: Set<String> = emptySet()
 
-    private fun showOverlay() {
+    private fun showWaveform() {
         main.post {
             val content = ime.window?.findViewById(android.R.id.content) as? android.view.ViewGroup
-            val kbId = ime.resources.getIdentifier("keyboard_view", "id", ime.packageName)
-            val kbView = if (content != null && kbId != 0) content.findViewById<View>(kbId) else null
-            val kbParent = kbView?.parent as? android.view.ViewGroup
-            val existing = overlay
+            val stripId = ime.resources.getIdentifier("suggestions_strip", "id", ime.packageName)
+            val strip = if (content != null && stripId != 0) content.findViewById<View>(stripId) as? android.view.ViewGroup else null
+            val existing = waveform
             if (existing != null) {
-                val attached = existing.parent === kbParent && kbView != null &&
-                        kbView.width == existing.width && kbView.height == existing.height
-                if (attached) {
-                    Log.d(TAG, "overlay: reusing existing view")
-                    existing.visibility = View.VISIBLE
+                if (existing.parent === strip && strip != null) {
+                    Log.d(TAG, "waveform: reusing existing view")
                     return@post
                 }
-                // keyboard view was recreated (layout/theme switch) — the old overlay
-                // is anchored to a dead parent, drop it and re-anchor fresh
-                Log.d(TAG, "overlay: stale anchor (parent ok=${existing.parent === kbParent}, kb=${kbView?.width}x${kbView?.height}) — re-anchoring")
+                // strip was recreated — drop the stale view and anchor fresh
+                Log.d(TAG, "waveform: stale anchor — re-anchoring")
                 (existing.parent as? android.view.ViewGroup)?.removeView(existing)
-                overlay = null
+                waveform = null
             }
-            if (content == null) {
-                Log.w(TAG, "overlay: no window/content — retrying")
-                main.postDelayed({ showOverlay() }, 100)
+            if (strip == null || strip.width == 0) {
+                Log.w(TAG, "waveform: suggestion strip not ready (id=$stripId, strip=${strip != null}, width=${strip?.width}) — retrying")
+                main.postDelayed({ showWaveform() }, 100)
                 return@post
             }
-            if (kbView == null || kbParent == null || kbView.width == 0 || kbView.height == 0) {
-                // keyboard not laid out yet — retry shortly
-                Log.w(TAG, "overlay: keyboard view not ready (kbId=$kbId view=${kbView != null}, parent=${kbParent != null}, size=${kbView?.width}x${kbView?.height}) — retrying")
-                main.postDelayed({ showOverlay() }, 100)
-                return@post
-            }
-            Log.d(TAG, "overlay anchored to keyboard view ${kbView.width}x${kbView.height}, letter area $letterAreaHeight")
-            val ov = RecordingOverlay(ime, themeBackground, themeCircle, kbView.width, kbView.height, letterAreaHeight)
-            kbParent.addView(ov, kbParent.indexOfChild(kbView) + 1, android.widget.FrameLayout.LayoutParams(kbView.width, kbView.height))
-            overlay = ov
-            ov.visibility = View.VISIBLE
+            Log.d(TAG, "waveform anchored to suggestion strip ${strip.width}x${strip.height}")
+            val bar = WaveformBarView(ime, themeBackground, themeLine)
+            // explicit size: the strip is wrap_content, MATCH_PARENT would measure 0
+            strip.addView(bar, android.widget.LinearLayout.LayoutParams(strip.width, strip.height))
+            // the waveform takes over the strip: hide suggestions/pills while recording
+            for (i in 0 until strip.childCount - 1) strip.getChildAt(i).visibility = View.GONE
+            waveform = bar
         }
     }
 
-    private fun hideOverlay() {
-        main.post { overlay?.visibility = View.INVISIBLE }
+    private fun hideWaveform() {
+        main.post {
+            waveform?.let { bar ->
+                (bar.parent as? android.view.ViewGroup)?.let { strip ->
+                    strip.removeView(bar)
+                    for (i in 0 until strip.childCount) strip.getChildAt(i).visibility = View.VISIBLE
+                }
+            }
+            waveform = null
+        }
     }
 
     /** Key-down on the layout voice key: start push-to-talk. */
@@ -253,7 +250,7 @@ class DictationController(private val ime: InputMethodService) {
                         sum += v * v
                     }
                     val rms = kotlin.math.sqrt(sum / n)
-                    overlay?.pushAmplitude(rms.toFloat()) // thread-safe (postInvalidateOnAnimation)
+                    waveform?.pushAmplitude(rms.toFloat()) // thread-safe (postInvalidateOnAnimation)
                 }
             }
             // hit the 30 s cap with nobody pressing stop (user walked away) — auto-finalize
@@ -261,13 +258,13 @@ class DictationController(private val ime: InputMethodService) {
                 finalizeOnExecutor()
             }
         }.also { it.start() }
-        showOverlay()
+        showWaveform()
         if (pendingRelease) finalizeOnExecutor()
     }
 
     private fun finalizeOnExecutor() {
         sessionActive = false
-        hideOverlay()
+        hideWaveform()
         executor.execute {
             val pcm = stopRecorder() ?: return@execute
             val keyboardLanguage = currentLanguage()

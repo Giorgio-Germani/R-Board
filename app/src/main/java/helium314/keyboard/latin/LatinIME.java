@@ -1425,17 +1425,9 @@ public class LatinIME extends InputMethodService implements
     /** hands the current theme colors and the letter-row boundary to the dictation overlay */
     public void passDictationColors() {
         final Colors colors = mSettings.getCurrent().mColors;
-        int letterAreaHeight = 0;
-        final Keyboard keyboard = mKeyboardSwitcher.getKeyboard();
-        if (keyboard != null) {
-            final Key voiceKey = keyboard.getKey(KeyCode.VOICE_INPUT);
-            if (voiceKey != null)
-                letterAreaHeight = voiceKey.getY(); // top edge of the bottom row
-        }
         getDictation().setColors(
-                colors.get(ColorType.MAIN_BACKGROUND),
                 colors.get(ColorType.KEY_TEXT), // the waveform uses the letter color
-                letterAreaHeight);
+                colors.get(ColorType.STRIP_BACKGROUND)); // covers the suggestions area while recording
         // dictation only speaks the keyboard's active languages — everything else is ignored
         final java.util.HashSet<String> languages = new java.util.HashSet<>();
         if (DeviceProtectedUtils.getSharedPreferences(this)
