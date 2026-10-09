@@ -101,11 +101,6 @@ open class SettingsActivity : ComponentActivity(), SharedPreferences.OnSharedPre
                         !UncachedInputMethodManagerUtils.isThisImeCurrent(this, imm)
                                 || !UncachedInputMethodManagerUtils.isThisImeEnabled(this, imm)
                     ) }
-                    var showGestureLibPrompt by rememberSaveable { mutableStateOf(
-                        !BuildConfig.BUILD_TYPE.equals("nouserlib")
-                                && prefs.getBoolean(Settings.PREF_GESTURE_INPUT, Defaults.PREF_GESTURE_INPUT)
-                                && !JniUtils.sHaveGestureLib
-                    ) }
                     if (spellchecker)
                         Scaffold(contentWindowInsets = WindowInsets.safeDrawing) { innerPadding ->
                             Column(Modifier.padding(innerPadding)) {
@@ -126,12 +121,6 @@ open class SettingsActivity : ComponentActivity(), SharedPreferences.OnSharedPre
                         SettingsNavHost(onClickBack = { this.finish() })
                         if (showWelcomeWizard) {
                             WelcomeWizard(close = { showWelcomeWizard = false }, finish = this::finish)
-                        } else if (showGestureLibPrompt) {
-                            GestureLibDownloadDialog(onDeclined = {
-                                showGestureLibPrompt = false
-                                // declining swiping disables it, so the prompt will not come back
-                                prefs.edit { putBoolean(Settings.PREF_GESTURE_INPUT, false) }
-                            }, onInstalled = { showGestureLibPrompt = false })
                         } else if (crashReports.isNotEmpty()) {
                             val ctx = LocalContext.current
                             ConfirmationDialog(
