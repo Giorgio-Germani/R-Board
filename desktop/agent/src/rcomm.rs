@@ -21,7 +21,7 @@ pub const SERVICE_UUID: GUID = GUID::from_u128(0x8c1f9a52_6e3b_4c7a_9d4e_2b1f0a7
 
 /// Blocks until the WinRT async operation completes (windows-future 0.3 keeps
 /// its blocking helpers private, so we poll Status).
-trait Wait {
+pub(crate) trait Wait {
     type Output;
     fn rwait(&self) -> Result<Self::Output>;
 }
@@ -101,6 +101,35 @@ pub fn parse_address(s: &str) -> Option<u64> {
 
 pub fn hostname() -> String {
     std::env::var("COMPUTERNAME").unwrap_or_else(|_| "windows-pc".into())
+}
+
+/// human-readable name of a paired device (shown by the setup wizard)
+pub fn device_name(address: u64) -> Option<String> {
+    let device = BluetoothDevice::FromBluetoothAddressAsync(address).ok()?.rwait().ok()?;
+    let name = device.Name().ok()?.to_string();
+    let name = name.trim().to_string();
+    if name.is_empty() { None } else { Some(name) }
+}
+
+/// Does the phone at `address` advertise the clipboard sync service right
+/// now? Uncached SDP query, retried (the query is flaky, see
+/// `discover_paired_phone`); a `false` usually means the phone-side sync
+/// service is not running.
+pub fn service_available(address: u64) -> Result<bool> {
+    let device = BluetoothDevice::FromBluetoothAddressAsync(address)?.rwait()?;
+    let service_id = RfcommServiceId::FromUuid(SERVICE_UUID)?;
+    for attempt in 1..=3 {
+        let services = device
+            .GetRfcommServicesForIdWithCacheModeAsync(&service_id, BluetoothCacheMode::Uncached)?
+            .rwait()?;
+        if services.Services()?.Size()? > 0 {
+            return Ok(true);
+        }
+        if attempt < 3 {
+            thread::sleep(Duration::from_millis(1500));
+        }
+    }
+    Ok(false)
 }
 
 /// Scans the paired Bluetooth devices for one advertising the R-Board sync

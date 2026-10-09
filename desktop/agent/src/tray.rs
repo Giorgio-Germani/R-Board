@@ -8,6 +8,7 @@ use tray_icon::menu::{Menu, MenuEvent, MenuItem};
 use tray_icon::TrayIconBuilder;
 
 const EXIT_MENU_ID: &str = "rboard-exit";
+const SETUP_MENU_ID: &str = "rboard-setup";
 
 pub fn run_tray() -> ! {
     let event_loop = EventLoop::new();
@@ -15,9 +16,10 @@ pub fn run_tray() -> ! {
     let exit_item = MenuItem::with_id(EXIT_MENU_ID, "Beenden", true, None);
     let _ = menu.append_items(&[
         &MenuItem::with_id("rboard-title", "R-Board Clipboard Sync", false, None),
+        &MenuItem::with_id(SETUP_MENU_ID, "Setup-Assistent …", true, None),
         &exit_item,
     ]);
-    let mut tray = TrayIconBuilder::new()
+    let tray = TrayIconBuilder::new()
         .with_tooltip("R-Board Clipboard Sync")
         .with_icon(load_icon())
         .with_menu(Box::new(menu))
@@ -33,6 +35,16 @@ pub fn run_tray() -> ! {
         for ev in menu_channel.try_recv() {
             if ev.id() == exit_item.id() {
                 std::process::exit(0);
+            }
+            if ev.id() == SETUP_MENU_ID {
+                // the wizard runs on its own thread with its own window; a
+                // second invocation while one is open is a no-op
+                thread::Builder::new()
+                    .name("setup-wizard".into())
+                    .spawn(|| {
+                        crate::setup::run_setup(crate::own_id());
+                    })
+                    .ok();
             }
         }
         let connected = crate::CONNECTED.load(std::sync::atomic::Ordering::SeqCst);
