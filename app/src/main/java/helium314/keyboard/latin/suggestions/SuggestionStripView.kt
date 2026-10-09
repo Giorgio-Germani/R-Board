@@ -46,12 +46,14 @@ import helium314.keyboard.latin.settings.DebugSettings
 import helium314.keyboard.latin.settings.Defaults
 import helium314.keyboard.latin.settings.Settings
 import helium314.keyboard.latin.utils.ToolbarKey
+
 import helium314.keyboard.latin.utils.ToolbarMode
 import helium314.keyboard.latin.utils.addPinnedKey
 import helium314.keyboard.latin.utils.createToolbarKey
 import helium314.keyboard.latin.utils.dpToPx
 import helium314.keyboard.latin.utils.getEnabledToolbarKeys
 import helium314.keyboard.latin.utils.getPinnedToolbarKeys
+import helium314.keyboard.latin.utils.getStringResourceOrName
 import helium314.keyboard.latin.utils.prefs
 import helium314.keyboard.latin.utils.removeFirst
 import helium314.keyboard.latin.utils.removePinnedKey
@@ -119,6 +121,9 @@ class SuggestionStripView(context: Context, attrs: AttributeSet?, defStyle: Int)
     private val pinnedKeys: ViewGroup = findViewById(R.id.pinned_keys)
     private val suggestionsStrip: ViewGroup = findViewById(R.id.suggestions_strip)
     private val toolbarExpandKey = findViewById<ImageButton>(R.id.suggestions_strip_toolbar_key)
+    private val emojiKey = findViewById<ImageButton>(R.id.suggestions_strip_emoji_key)
+    private val voiceKey = findViewById<ImageButton>(R.id.suggestions_strip_voice_key)
+    private val languageKey = findViewById<ImageButton>(R.id.suggestions_strip_language_key)
     private val incognitoIcon = KeyboardIconsSet.instance.getNewDrawable(ToolbarKey.INCOGNITO.name, context)
     private val toolbarArrowIcon = KeyboardIconsSet.instance.getNewDrawable(KeyboardIconsSet.NAME_TOOLBAR_KEY, context)
     private val defaultToolbarBackground: Drawable = toolbarExpandKey.background
@@ -142,6 +147,25 @@ class SuggestionStripView(context: Context, attrs: AttributeSet?, defStyle: Int)
         colors.setBackground(toolbarExpandKey, ColorType.STRIP_BACKGROUND) // necessary because background is re-used for defaultToolbarBackground
         colors.setColor(toolbarExpandKey, ColorType.TOOL_BAR_EXPAND_KEY)
         colors.setColor(toolbarExpandKey.background, ColorType.TOOL_BAR_EXPAND_KEY_BACKGROUND)
+
+        // fixed keys moved from the bottom row (emoji next to the expand key on
+        // the left, language switch and voice on the right) — always visible, so
+        // the spacebar can use the room in the bottom row
+        for ((button, key) in arrayOf(
+            emojiKey to ToolbarKey.EMOJI,
+            languageKey to ToolbarKey.LANGUAGE,
+            voiceKey to ToolbarKey.VOICE,
+        )) {
+            button.layoutParams.height = toolbarHeight
+            button.layoutParams.width = toolbarHeight // square, same as the expand key
+            button.tag = key
+            button.contentDescription = key.name.lowercase().getStringResourceOrName("", context)
+            button.setImageDrawable(KeyboardIconsSet.instance.getNewDrawable(key.name, context))
+            button.setOnClickListener(this)
+            button.setOnLongClickListener(this)
+            colors.setColor(button, ColorType.TOOL_BAR_KEY)
+            colors.setBackground(button, ColorType.STRIP_BACKGROUND)
+        }
 
         // background indicator for pinned keys
         val color = colors.get(ColorType.TOOL_BAR_KEY_ENABLED_BACKGROUND) or -0x1000000 // ignore alpha (in Java this is more readable 0xFF000000)
@@ -231,6 +255,12 @@ class SuggestionStripView(context: Context, attrs: AttributeSet?, defStyle: Int)
         pinnedKeys.isVisible = !toolbarVisible
         suggestionsStrip.isVisible = !toolbarVisible
         toolbarContainer.isVisible = toolbarVisible
+        // with the toolbar open, the expanded row covers the emoji, language
+        // and voice keys — the expanded strip looks exactly like it did before
+        // those keys moved up here
+        emojiKey.isVisible = !toolbarVisible
+        languageKey.isVisible = !toolbarVisible
+        voiceKey.isVisible = !toolbarVisible
 
         if (DEBUG_SUGGESTIONS) {
             for (view in debugInfoViews) {
@@ -504,6 +534,9 @@ class SuggestionStripView(context: Context, attrs: AttributeSet?, defStyle: Int)
         val show = Settings.getValues().mShowsVoiceInputKey
         toolbar.findViewWithTag<View>(ToolbarKey.VOICE)?.isVisible = show
         pinnedKeys.findViewWithTag<View>(ToolbarKey.VOICE)?.isVisible = show
+        // the fixed voice key never hides: R-Board runs its own offline dictation,
+        // it must not depend on the (flaky) system voice IME readiness — same
+        // policy as the layout mic key (see MainKeyboardView.updateShortcutKey)
     }
 
     private fun updateKeys() {

@@ -143,6 +143,7 @@ class KeyboardIconsSet private constructor() {
                     ToolbarKey.CLEAR_CLIPBOARD -> R.drawable.sym_keyboard_clear_clipboard_holo
                     ToolbarKey.CLOSE_HISTORY -> R.drawable.ic_close
                     ToolbarKey.EMOJI -> R.drawable.sym_keyboard_smiley_holo
+                    ToolbarKey.LANGUAGE -> R.drawable.sym_keyboard_language_switch
                     ToolbarKey.LEFT -> R.drawable.ic_dpad_left
                     ToolbarKey.RIGHT -> R.drawable.ic_dpad_right
                     ToolbarKey.UP -> R.drawable.ic_dpad_up
@@ -206,6 +207,7 @@ class KeyboardIconsSet private constructor() {
                     ToolbarKey.CLEAR_CLIPBOARD -> R.drawable.sym_keyboard_clear_clipboard_lxx
                     ToolbarKey.CLOSE_HISTORY -> R.drawable.ic_close
                     ToolbarKey.EMOJI -> R.drawable.sym_keyboard_smiley_lxx
+                    ToolbarKey.LANGUAGE -> R.drawable.sym_keyboard_language_switch_lxx
                     ToolbarKey.LEFT -> R.drawable.ic_dpad_left
                     ToolbarKey.RIGHT -> R.drawable.ic_dpad_right
                     ToolbarKey.UP -> R.drawable.ic_dpad_up
@@ -269,6 +271,7 @@ class KeyboardIconsSet private constructor() {
                     ToolbarKey.CLEAR_CLIPBOARD -> R.drawable.sym_keyboard_clear_clipboard_rounded
                     ToolbarKey.CLOSE_HISTORY -> R.drawable.ic_close_rounded
                     ToolbarKey.EMOJI -> R.drawable.sym_keyboard_smiley_rounded
+                    ToolbarKey.LANGUAGE -> R.drawable.sym_keyboard_language_switch_lxx
                     ToolbarKey.LEFT -> R.drawable.ic_dpad_left_rounded
                     ToolbarKey.RIGHT -> R.drawable.ic_dpad_right_rounded
                     ToolbarKey.UP -> R.drawable.ic_dpad_up_rounded
