@@ -144,7 +144,7 @@ class SyncSetupActivity : AppCompatActivity() {
                         setOnClickListener {
                             android.widget.Toast.makeText(
                                 this@SyncSetupActivity,
-                                "Sichtbar für 5 Minuten — wähle am PC \"Gerät hinzufügen\" und dann das Telefon.",
+                                "Sichtbar für 5 Minuten — starte am PC den R-Board-Setup-Assistenten; er findet das Telefon automatisch.",
                                 android.widget.Toast.LENGTH_LONG
                             ).show()
                             discoverableLauncher.launch(
